@@ -1,0 +1,10 @@
+# Mac OS
+.DS_Store
+
+# Swift build metadata
+.swiftpm/
+Package.resolved
+.build/
+
+# Xcode user settings
+xcuserdata/

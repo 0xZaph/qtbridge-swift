@@ -1,0 +1,88 @@
+// swift-tools-version: 6.0
+import PackageDescription
+import CompilerPluginSupport
+import Foundation
+
+let useLocalQt: Bool = false
+let useLocal: Bool = envVar("QTBRIDGE_USE_LOCAL_QT_PACKAGE", useLocalQt)
+
+let dependencies: [Package.Dependency] = [
+    .package(url: "https://github.com/apple/swift-syntax.git", from: "600.0.0"),
+
+    useLocal ? .package(path: "../Qt")
+    : .package(url: "bridge@swift-srv.ci.qt.io:/srv/qt/swift.git", branch: "main")
+]
+
+let qtPackageName: String = useLocal ? "Qt" : "swift"
+
+let package = Package(
+    name: "QtBridge",
+    platforms: [
+        .macOS(.v14),
+    ],
+    products: [
+        .library(name: "QtBridge", targets: ["QtBridge"])
+    ],
+    dependencies: dependencies,
+    targets: [
+        .macro(
+            name: "QtBridgeMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+            ]
+        ),
+        .target(
+            name: "QtBridgeCpp",
+            dependencies: [
+                .product(name: "QtCore", package: qtPackageName),
+                .product(name: "QtCorePrivate", package: qtPackageName),
+                .product(name: "QtQml", package: qtPackageName),
+                .product(name: "QtGui", package: qtPackageName),
+                .product(name: "QtTest", package: qtPackageName)
+            ]
+        ),
+        .target(
+            name: "QtBridge",
+            dependencies: [
+                "QtBridgeCpp",
+                "QtBridgeMacros",
+                .product(name: "QtCore", package: qtPackageName),
+                .product(name: "QtQml", package: qtPackageName),
+                .product(name: "QtGui", package: qtPackageName),
+                .product(name: "QmlImports", package: qtPackageName)
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx),
+            ]
+        ),
+        .testTarget(
+            name: "QtBridgeXCTests",
+            dependencies: [
+                "QtBridge", "QtBridgeMacros",
+                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        ),
+        .testTarget(
+            name: "QtQuickTests",
+            dependencies: [ "QtBridge" ],
+            resources: [
+                .copy("Resources/qml")
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        )
+    ],
+    cxxLanguageStandard: .cxx17
+)
+
+func envVar(_ name: String, _ def: Bool) -> Bool {
+    if let value = ProcessInfo.processInfo.environment[name] {
+        return (value as NSString).boolValue
+    }
+    return def
+}
