@@ -14,10 +14,4 @@ enum QtBridgableOutputs {
         }()
     """
     }
-
-    static let signalFunc : String  = """
-    private func emitSignal(for propertyName: String) {
-            type(of: self).metaObjectBuilder.emitSignal(sender: self, for: propertyName)
-        }
-    """
 }

@@ -68,8 +68,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestModel.someVar
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
@@ -121,8 +119,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestType.name
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             public class TestModel {
                 var someVar: [String] = ["test String"] {
@@ -154,8 +150,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                         keyPath: \\TestModel.userType
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,
@@ -234,8 +228,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,
@@ -271,8 +263,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestModel.someConst
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,
@@ -361,8 +351,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                         keyPath: \\TestModel.someArrayTwo
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
@@ -435,8 +423,6 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],

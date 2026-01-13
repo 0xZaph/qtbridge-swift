@@ -119,8 +119,6 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\TestModel.arrayTwoModel
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,
@@ -196,8 +194,6 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\Message.date
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             public class ChatModel {
 
@@ -218,8 +214,6 @@ final class QListModelTests: XCTestCase {
                     keyPath: \\ChatModel.msgs
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,
@@ -296,8 +290,6 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\Message.date
                     )
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             public class ChatModel {
                 public var msgs: QListModel<Message> = []
@@ -310,8 +302,6 @@ final class QListModelTests: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
-
-                \(QtBridgableOutputs.signalFunc)
             }
             """,
             macros: macros,

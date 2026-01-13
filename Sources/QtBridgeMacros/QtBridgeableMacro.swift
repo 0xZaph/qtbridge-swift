@@ -100,15 +100,6 @@ public struct QtBridgeableMacro {
         """
     }
 
-    static var emitSignalFunction : DeclSyntax {
-        return
-            """
-            private func emitSignal(for propertyName: String) {
-                type(of: self).metaObjectBuilder.emitSignal(sender: self, for: propertyName)
-            }
-            """
-    }
-
     private static let supportedBasicTypes: Set<String> = [
         "Int", "UInt", "Double", "Float", "String", "Bool", "[String]", "Array<String>"
     ]
@@ -305,7 +296,6 @@ extension QtBridgeableMacro : MemberMacro {
         }
 
         declarations.append(registerMethodsAndPropertiesFunction(registrations: registrations))
-        declarations.append(QtBridgeableMacro.emitSignalFunction)
         return declarations
     }
 }

@@ -15,9 +15,14 @@ public protocol QObjectBuildable : AnyObject,
 }
 
 extension QObjectBuildable {
+    public func emitSignal(for propertyName: String) {
+        Self.self.metaObjectBuilder.emitSignal(sender: self, for: propertyName)
+    }
+}
+
+extension QObjectBuildable {
     public func addInitialProperty(to app: QMLApp, name: String) {
-        guard let gettable = self as? QVariantGettable else { return }
-        app.addInitialProperty(name: name, value: gettable.toVariant())
+        app.addInitialProperty(name: name, value: self.toVariant())
     }
 }
 
