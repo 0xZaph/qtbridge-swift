@@ -6,7 +6,7 @@ import QtBridgeCpp
 
 public class QObjectHolder {
     package var proxy: QObjectProxy
-    internal var owner: QObjectBuildable
+    internal weak var owner: (QObjectBuildable)?
 
     public init(owner: QObjectBuildable) {
         self.owner = owner
@@ -15,10 +15,12 @@ public class QObjectHolder {
     }
 
     internal func getProperty(propIndex: Int) -> QVariant {
+        guard let owner = owner else { return QVariant() }
         return type(of: owner).metaObjectBuilder.getProperty(propIndex: propIndex, root: owner)
     }
 
     internal func setProperty(propIndex: Int, value: QVariant) -> Bool {
+        guard let owner = owner else { return false }
         return type(of: owner).metaObjectBuilder.setProperty(propIndex: propIndex, root: owner, value: value)
     }
 
