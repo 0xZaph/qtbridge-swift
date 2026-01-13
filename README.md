@@ -15,15 +15,16 @@ Swift and its associated components are licensed under the Apache License, Versi
 ## Contents
 
 1. [Introduction](##Introduction)
-2. [Supported platforms](##Supported-platforms)
-2. [Requirements](##Requirements)
-3. [Installing Qt Bridge](##Installing-Qt-Bridge)
+2. [Status](##Status)
+3. [Supported platforms](##Supported-platforms)
+4. [Requirements](##Requirements)
+5. [Installing Qt Bridge](##Installing-Qt-Bridge)
     1. [Importing Qt Bridge as a remote package](###Importing-Qt-Bridge-as-a-remote-package)
     2. [Importing Qt Bridge as a local package](Importing-Qt-Bridge-as-a-local-package)
-    3. [Building local Qt package](###Building-local-Qt-package)
-4. [Running examples](##Running-examples)
-5. [Using Xcode templates](##Using-Xcode-templates)
-6. [Stay in touch](##Stay-in-touch)
+    3. [Disable Library Validation Entitlement](###Disable-Library-Validation-Entitlement)
+6. [Running examples](##Running-examples)
+7. [Using Xcode templates](##Using-Xcode-templates)
+8. [Stay in touch](##Stay-in-touch)
 
 ## Introduction
 
@@ -38,6 +39,14 @@ and logic in Swift, and how to connect those models to QML views.
 
 Detailed documentation can be found [here](https://doc-snapshots.qt.io/qtbridges-dev/qtbridges-swift-index.html).
 
+## Status
+
+Qt Bridge for Swift is currently in early preview, and in active development.
+
+Notable limitations include:
+- APIs may change or even be removed.
+- There are many known issues and missing features.
+
 ## Supported platforms
 
 Currently, only **macOS (Apple Silicon)** is supported, with plans to extend support in the future.
@@ -51,10 +60,6 @@ Currently, only **macOS (Apple Silicon)** is supported, with plans to extend sup
 ## Installing Qt Bridge
 
 Qt Bridge is distributed as a Swift Package Manager package. You can add it to your project as a package dependency using either a local package reference or the repository URL.
-
-By default, Qt Bridge references a **Qt package** hosted in an **internal repository** that contains bundled, prebuilt Qt binaries. To build successfully, you must have a private SSH key with access to this repository. The SSH key must be placed in the `~/.ssh` directory, and the `~/.ssh/config` file must be configured accordingly.
-
-If you have access to the Qt internal repository, add it as a remote SwiftPM dependency. Otherwise, add Qt Bridge as a local package and build the local Qt package that Qt Bridge depends on.
 
 ### Importing Qt Bridge as a remote package
 
@@ -89,8 +94,6 @@ targets: [
     )
 ]
 ```
-
-If you have the private SSH key to the internal repo, the package will fetch its dependencies automatically.
 
 ### Importing Qt Bridge as a local package
 
@@ -135,143 +138,24 @@ targets: [
 ]
 ```
 
-If you don't have access to the Qt internal repository, follow the tutorial below to build the local Qt package and specify it as a dependency for Qt Bridge.
+### Disable Library Validation Entitlement
 
-### Building local Qt package
+When you use a Team in Xcode and enable automatic signing, Xcode may enable the
+**Hardened Runtime** for the generated macOS app target. With Hardened Runtime enabled,
+macOS enforces **library validation**, which restricts the app to loading only system
+libraries and libraries signed with a compatible signature. Qt Bridge loads additional
+Qt frameworks at runtime, and this can cause the app to fail to launch when library
+validation is enabled.
 
-#### 1. Create Qt package folder
+To fix this:
 
-Navigate to the cloned repository, copy Qt folder and place it next to the `qtbridge-swift` directory:
+1. Open the *Signing & Capabilities* tab.
+2. Select your app target.
+3. Expand *Hardened Runtime*.
+4. Manually chech *Disable Library Validation*.
 
-```
-$ cd /path/to/qtbridge-swift
-$ cp -R Qt ..
-```
-**This newly created Qt folder is our local Qt package and will be referred to as `/path/to/Qt` in these instructions.**
-
-#### 2. Download and build Qt 6.10.0 from source
-
-Check out the tutorial on how to [build Qt from source](https://wiki.qt.io/Building_Qt_6_from_Git), or follow the simplified instructions below.
-
-Navigate to the directory that will contain the top-level **qt6** repository and run the following command to clone it:
-```
-$ git clone git://code.qt.io/qt/qt5.git qt6
-```
-
-Qt Bridge depends on **Qt 6.10.0**, so switch to the corresponding branch:
-```
-$ cd qt6
-$ git switch 6.10.0
-```
-
-Next, fetch the submodule source code by running the following command from the `qt6` directory:
-```
-$ init-repository
-```
-
-Create a separate build directory parallel to the source directory:
-```
-$ cd ..
-$ mkdir qt6-build
-$ cd qt6-build
-```
-
-From the build directory, configure, build, and install Qt 6. Pass the desired installation path using the `-prefix` parameter:
-
-```
-$ ../qt6/configure \
-   -release \
-   -prefix your_qt_install_dir \
-   -nomake tests \
-   -nomake examples \
-   -no-feature-sql \
-   -no-feature-network \
-   -no-feature-qml-network \
-   -no-dbus \
-   --module-subset=qtbase,qtdeclarative
-
-$ cmake --build . --parallel
-
-$ cmake --install .
-```
-
-#### 3. Create .xcframeworks for the Qt package
-
-Navigate to `your_qt_install_dir/lib` folder and create .xcframework from each .framework:
-```
-$ cd your_qt_install_dir/lib
-
-$ for fw in *.framework; do
-  name="${fw%.framework}"
-  xcodebuild -create-xcframework \
-    -framework "$fw" \
-    -output "${name}.xcframework"
-done
-```
-
-Place the newly created .xcframeworks into the `path/to/Qt/lib/Frameworks` directory:
-
-```
-$ mkdir /path/to/Qt/lib/Frameworks
-$ mv *.xcframework /path/to/Qt/lib/Frameworks
-```
-
-#### 4. Copy Qt headers into the Qt package
-
-Copy `QtQmlIntegration` folder from `your_qt_install_dir/include` into the `path/to/Qt/include` directory:
-
-```
-$ cp -R ../include/QtQmlIntegration /path/to/Qt/include
-```
-
-#### 5. Copy plugins into the Qt package
-
-Copy `qml` and `plugins` folders from `your_qt_install_dir` into the root of the Qt package:
-
-```
-$ cp -R ../qml /path/to/Qt
-$ cp -R ../plugins /path/to/Qt
-```
-
-#### 6. Qt package is ready
-At this point, the Qt package is ready and its structure should look like this:
-
-```
-Qt
-├── Package.swift
-├── bundle.swift
-├── include
-│ ├── QtQmlIntegration
-│ └── _spmQtQmlIntegration.cpp
-├── lib
-│ ├── Frameworks
-│ │ ├── QtCore.xcframework
-│ │ ├── QtGui.xcframework
-│ │ ├── QtQml.xcframework
-│ │ └── ...
-│ ├── _spmQtCore.cpp
-│ └── ...
-├── plugins
-│ ├── platforms
-│ └── ...
-└── qml
-  ├── QtCore
-  └──...
-```
-
-#### 7. Modify `Package.swift` of the Qt Bridge
-
-If you prefer building from Xcode, edit `qtbridge-swift/Package.swift` and set the `useLocalQt` variable to true:
-
-`let useLocalQt: Bool = true`
-
-If you prefer building from the terminal, you can set an environment variable to use the local Qt package before building:
-
-```
-$ export QTBRIDGE_USE_LOCAL_QT_PACKAGE="true"
-```
-
-At this point, the Qt Bridge and Qt packages are ready, and any projects referencing Qt Bridge can be built successfully.
+Alternatively, you can disable *Hardened Runtime* entirely by clicking *Delete* next to
+it, but disabling Library Validation alone is sufficient.
 
 ## Running examples
 
@@ -332,22 +216,13 @@ Qt Bridge as a package dependency.
 
 ### Running the example application
 
-When you use a Team in Xcode and enable automatic signing, Xcode may enable the
-**Hardened Runtime** for the generated macOS app target. With Hardened Runtime enabled,
-macOS enforces **library validation**, which restricts the app to loading only system
-libraries and libraries signed with a compatible signature. Qt Bridge loads additional
-Qt frameworks at runtime, and this can cause the app to fail to launch when library
-validation is enabled.
-
-If you see a code signing error, open the app target’s **Signing & Capabilities** tab,
-expand Hardened Runtime, and manually check **Disable Library Validation**.
-You can also disable Hardened Runtime by clicking **Delete** on the right side of the
-tab.
+The generated project may fail to launch if **Hardened Runtime** is enabled because Qt Bridge dynamically loads Qt frameworks at runtime. To fix this, you need to disable **Library Validation**. For detailed instructions, see [Disable Library Validation Entitlement](##Disable-Library-Validation-Entitlement)
+.
 
 At this point, the example application is ready to run. You can do so, by pressing
-the **Run** button. The project template configures the basic build settings and
+the *Run* button. The project template configures the basic build settings and
 target configuration. For more advanced configuration, you can adjust
-**Build Settings** in the project navigator.
+*Build Settings* in the project navigator.
 
 ## Stay in touch
 
