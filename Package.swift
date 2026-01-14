@@ -10,10 +10,10 @@ let dependencies: [Package.Dependency] = [
     .package(url: "https://github.com/apple/swift-syntax.git", from: "600.0.0"),
 
     useLocal ? .package(path: "../Qt")
-    : .package(url: "bridge@swift-srv.ci.qt.io:/srv/qt/swift.git", branch: "main")
+    : .package(url: "https://git.qt.io/qtbridge/qtforswift.git", branch: "master")
 ]
 
-let qtPackageName: String = useLocal ? "Qt" : "swift"
+let qtPackageName: String = useLocal ? "Qt" : "qtforswift"
 
 let package = Package(
     name: "QtBridge",
