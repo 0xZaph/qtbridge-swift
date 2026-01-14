@@ -54,8 +54,9 @@ public class QMLApp {
             property.addInitialProperty(to: app, name: name)
         }
 
-        guard let qmlUrl = qApp.bundle.url(forResource: qApp.qmlFileName, withExtension: "qml") else {
-            fatalError("Missing QML file '\(qApp.qmlFileName).qml' in app bundle.")
+        let fileName = qApp.qmlFileName
+        guard let qmlUrl = qApp.bundle.url(forResource: fileName, withExtension: "qml") else {
+            fatalError("Missing QML file '\(fileName).qml' in app bundle.")
         }
         app.setRootQml(path: qmlUrl.path)
         app.run(argc: CommandLine.argc, argv: CommandLine.unsafeArgv)
