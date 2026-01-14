@@ -8,16 +8,36 @@
 
 /* Begin PBXBuildFile section */
 		BF0DA4782F169EC20075C5F2 /* QtBridge in Frameworks */ = {isa = PBXBuildFile; productRef = BF0DA4772F169EC20075C5F2 /* QtBridge */; };
+		EA2E07BD2F17A239005B684B /* QtBridge in Frameworks */ = {isa = PBXBuildFile; productRef = EA2E07BC2F17A239005B684B /* QtBridge */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		BF0DA45E2F169E590075C5F2 /* MinimalApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MinimalApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA2E07952F1799A6005B684B /* MinimalAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinimalAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		EA2E07A72F179B17005B684B /* Exceptions for "MinimalApp" folder in "MinimalAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Sources/listModel.swift,
+			);
+			target = EA2E07942F1799A6005B684B /* MinimalAppTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BF0DA4602F169E590075C5F2 /* MinimalApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EA2E07A72F179B17005B684B /* Exceptions for "MinimalApp" folder in "MinimalAppTests" target */,
+			);
 			path = MinimalApp;
+			sourceTree = "<group>";
+		};
+		EA2E07962F1799A6005B684B /* MinimalAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MinimalAppTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -31,6 +51,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA2E07922F1799A6005B684B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA2E07BD2F17A239005B684B /* QtBridge in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -38,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				BF0DA4602F169E590075C5F2 /* MinimalApp */,
+				EA2E07962F1799A6005B684B /* MinimalAppTests */,
 				BF0DA45F2F169E590075C5F2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				BF0DA45E2F169E590075C5F2 /* MinimalApp.app */,
+				EA2E07952F1799A6005B684B /* MinimalAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,6 +106,29 @@
 			productReference = BF0DA45E2F169E590075C5F2 /* MinimalApp.app */;
 			productType = "com.apple.product-type.application";
 		};
+		EA2E07942F1799A6005B684B /* MinimalAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA2E079B2F1799A6005B684B /* Build configuration list for PBXNativeTarget "MinimalAppTests" */;
+			buildPhases = (
+				EA2E07912F1799A6005B684B /* Sources */,
+				EA2E07922F1799A6005B684B /* Frameworks */,
+				EA2E07932F1799A6005B684B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EA2E07962F1799A6005B684B /* MinimalAppTests */,
+			);
+			name = MinimalAppTests;
+			packageProductDependencies = (
+				EA2E07BC2F17A239005B684B /* QtBridge */,
+			);
+			productName = MinimalAppTests;
+			productReference = EA2E07952F1799A6005B684B /* MinimalAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -87,6 +140,9 @@
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					BF0DA45D2F169E590075C5F2 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					EA2E07942F1799A6005B684B = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -109,6 +165,7 @@
 			projectRoot = "";
 			targets = (
 				BF0DA45D2F169E590075C5F2 /* MinimalApp */,
+				EA2E07942F1799A6005B684B /* MinimalAppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -121,10 +178,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA2E07932F1799A6005B684B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BF0DA45A2F169E590075C5F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA2E07912F1799A6005B684B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -310,6 +381,40 @@
 			};
 			name = Release;
 		};
+		EA2E07992F1799A6005B684B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = qt.io.MinimalAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		EA2E079A2F1799A6005B684B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = qt.io.MinimalAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -331,6 +436,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		EA2E079B2F1799A6005B684B /* Build configuration list for PBXNativeTarget "MinimalAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA2E07992F1799A6005B684B /* Debug */,
+				EA2E079A2F1799A6005B684B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -342,6 +456,10 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		BF0DA4772F169EC20075C5F2 /* QtBridge */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = QtBridge;
+		};
+		EA2E07BC2F17A239005B684B /* QtBridge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = QtBridge;
 		};

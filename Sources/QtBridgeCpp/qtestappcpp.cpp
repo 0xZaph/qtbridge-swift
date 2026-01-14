@@ -20,6 +20,11 @@ void QTestAppCpp::setPluginsPath(const char *path)
 void QTestAppCpp::setInputDir(const char *dir) {
     m_inputDir = dir ? dir : "";
 }
+
+void QTestAppCpp::setTestName(const char *name) {
+    m_testName = name ? name : "";
+}
+
 void QTestAppCpp::registerQmlSingleton(const char* uri, int major, int minor,
                                        const char* name, QObjectProxy proxy)
 {
@@ -33,5 +38,7 @@ int QTestAppCpp::runQtQuickTests(int argc, char** argv)
     qputenv("QML2_IMPORT_PATH", m_importPath);
 
     const char* dir = m_inputDir.empty() ? nullptr : m_inputDir.c_str();
-    return quick_test_main(argc, argv, "qtbridge-autotest", dir);
+    const char* testName = m_testName.empty() ? nullptr : m_testName.c_str();
+
+    return quick_test_main(argc, argv, testName, dir);
 }
