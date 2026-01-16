@@ -122,14 +122,18 @@ public class QMetaObjectBuilder
         { (propertyId: Int32,
            selfPtr: UnsafeMutableRawPointer?,
            objPt: UnsafeMutableRawPointer?) -> QtBridgeCpp.QVariant in
-            let mySelf = QMetaObjectBuilder.bridge(selfPtr!)!
+            guard let selfPtr,
+                  let mySelf = QMetaObjectBuilder.bridge(selfPtr)
+            else { return QtBridgeCpp.QVariant() }
             return mySelf.getProperty(propIndex: Int(propertyId), rootPtr: objPt).cppVariant()
         },
         { (propertyId: Int32,
            selfPtr: UnsafeMutableRawPointer?,
            objPtr: UnsafeMutableRawPointer?,
            variant: UnsafePointer<QtBridgeCpp.QVariant>?) -> Bool in
-            let mySelf = QMetaObjectBuilder.bridge(selfPtr!)!
+            guard let selfPtr,
+                  let mySelf = QMetaObjectBuilder.bridge(selfPtr)
+            else { return false }
             return mySelf.setProperty(propIndex: Int(propertyId),
                                       rootPtr: objPtr,
                                       value: QVariant(value: variant.pointee))
@@ -169,7 +173,9 @@ public class QMetaObjectBuilder
         { (propertyId: Int32,
            selfPtr: UnsafeMutableRawPointer?,
            objPt: UnsafeMutableRawPointer?) -> QtBridgeCpp.QVariant in
-            let mySelf = QMetaObjectBuilder.bridge(selfPtr!)!
+            guard let selfPtr,
+                  let mySelf = QMetaObjectBuilder.bridge(selfPtr)
+            else { return QtBridgeCpp.QVariant() }
             return mySelf.getProperty(propIndex: Int(propertyId), rootPtr: objPt).cppVariant()
         }, nil)
     }
@@ -191,7 +197,9 @@ public class QMetaObjectBuilder
            selfPtr: UnsafeMutableRawPointer?,
            objPtr: UnsafeMutableRawPointer?,
            params: MetaParamsList) -> Void in
-            let mySelf =  QMetaObjectBuilder.bridge(selfPtr!)!
+            guard let selfPtr,
+                  let mySelf = QMetaObjectBuilder.bridge(selfPtr)
+            else { return }
             mySelf.invoke(methodIndex: Int(methodId), rootPtr: objPtr, args: QMetaParamsList(args: params))
         })
     }

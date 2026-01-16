@@ -6,34 +6,43 @@ import CxxStdlib
 import QtBridgeCpp
 
 public final class QAbstractListModel {
-    private var cppModel: QAbstractListModelCpp!
+    private lazy var cppModel: QAbstractListModelCpp = {
+        return QAbstractListModelCpp.create(
+            UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        )
+    }()
 
     private static let registerCallbacks: Void = {
         QAbstractListModelCpp.registerRowCount { swiftModel, idx in
-            guard let swiftModel = swiftModel,
-                  let idx = idx else { return 0 }
+            guard let swiftModel, let idx,
+                  let bridge = QAbstractListModel.bridge(swiftModel)
+            else { return 0 }
             let index = QModelIndex(idx.pointee)
-            return Int32(QAbstractListModel.bridge(swiftModel)!.rowCount(index))
+            return Int32(bridge.rowCount(index))
         }
 
         QAbstractListModelCpp.registerData { swiftModel, idx, role in
-            guard let swiftModel = swiftModel,
-                  let idx = idx else { return QtBridgeCpp.QVariant() }
+            guard let swiftModel, let idx,
+                  let bridge = QAbstractListModel.bridge(swiftModel)
+            else { return QtBridgeCpp.QVariant() }
             let index = QModelIndex(idx.pointee)
-            return QAbstractListModel.bridge(swiftModel)!.data(index, role).cppVariant()
+            return bridge.data(index, role).cppVariant()
         }
 
         QAbstractListModelCpp.registerSetData { swiftModel, idx, val, role in
-            guard let swiftModel = swiftModel,
-                  let idx = idx else { return false }
+            guard let swiftModel, let idx,
+                  let bridge = QAbstractListModel.bridge(swiftModel)
+            else { return false }
             let index = QModelIndex(idx.pointee)
             let value = QVariant(value: val.pointee)
-            return QAbstractListModel.bridge(swiftModel)!.setData(index, value, role)
+            return bridge.setData(index, value, role)
         }
 
         QAbstractListModelCpp.registerRoleNames { swiftModel in
-            guard let swiftModel = swiftModel else { return CallbackBase.QHashIntToByteArray() }
-            let roleNames = QAbstractListModel.bridge(swiftModel)!.roleNames()
+            guard let swiftModel,
+                  let bridge = QAbstractListModel.bridge(swiftModel)
+            else { return CallbackBase.QHashIntToByteArray() }
+            let roleNames = bridge.roleNames()
             var qhash = CallbackBase.QHashIntToByteArray()
             for (key, value) in roleNames {
                 qhashInsert(&qhash, key, std.string(value))
@@ -44,9 +53,7 @@ public final class QAbstractListModel {
 
     public init() {
         QAbstractListModel.registerCallbacks
-        self.cppModel = QAbstractListModelCpp.create(
-            UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        )
+        _ = self.cppModel
     }
 
     deinit {
@@ -61,15 +68,15 @@ public final class QAbstractListModel {
 
     internal func bind<Owner: AnyObject, Element>(owner: Owner,
                                                   keyPath: ReferenceWritableKeyPath<Owner, [Element]>) {
-        weak var weakOwner = owner
+        weak let weakOwner = owner
 
         count = { [weak weakOwner] in
-            guard let ownerClass = weakOwner else { return 0 }
-            return ownerClass[keyPath: keyPath].count
+            guard let weakOwner else { return 0 }
+            return weakOwner[keyPath: keyPath].count
         }
         elementAt = { [weak weakOwner] idx in
-            guard let ownerClass = weakOwner else { return () }
-            return ownerClass[keyPath: keyPath][idx] as Any
+            guard let weakOwner else { return () }
+            return weakOwner[keyPath: keyPath][idx] as Any
         }
 
         roles.removeAll()
@@ -166,7 +173,7 @@ public final class QAbstractListModel {
 
     internal func endResetModel() { getCppModel().endResetModel() }
 
-    internal func getCppModel() -> QAbstractListModelCpp { return cppModel! }
+    internal func getCppModel() -> QAbstractListModelCpp { return cppModel }
 
     internal static func bridge(_ swiftModel: UnsafeMutableRawPointer) -> QAbstractListModel? {
         return Unmanaged<QAbstractListModel>.fromOpaque(swiftModel).takeUnretainedValue()
