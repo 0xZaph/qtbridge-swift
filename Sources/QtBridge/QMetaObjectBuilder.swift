@@ -75,12 +75,29 @@ public class QMetaObjectBuilder
     }
 
     public func registerSignal(for propertyName: String) {
-        self.builder.registerSignal(QMetaObjectBuilder.signalName(for: propertyName))
+        self.builder.registerSignal(QMetaObjectBuilder.signalName(for: propertyName), [])
+    }
+
+    public func registerSignal(signalName: String, argTypes: [QVariantGettable.Type] = []) {
+        var cppArgTypeIds = CppVectorOfInt()
+        for argType in argTypes {
+            cppArgTypeIds.push_back(argType.metaType())
+        }
+        self.builder.registerSignal(signalName, cppArgTypeIds)
     }
 
     public func emitSignal(sender: QObjectBuildable, for propertyName: String) {
         self.builder.emitSignal(sender.objectHolder.proxy,
-                                QMetaObjectBuilder.signalName(for: propertyName))
+                                QMetaObjectBuilder.signalName(for: propertyName), [])
+    }
+
+    public func emitSignal(sender: QObjectBuildable, signalName: String, args: [QVariant] = []) {
+        var argsVector = CppVectorOfQVariant()
+        argsVector.reserve(args.count)
+        for arg in args {
+            argsVector.push_back(arg.cppVariant())
+        }
+        self.builder.emitSignal(sender.objectHolder.proxy, signalName, argsVector)
     }
 
     public func registerProperty<Root: QObjectBuildable, Member: QVariantSettable & Equatable>(

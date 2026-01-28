@@ -11,3 +11,6 @@ public macro QtTracked() = #externalMacro(module: "QtBridgeMacros", type: "QtTra
 
 @attached(peer)
 public macro QtIgnored() = #externalMacro(module: "QtBridgeMacros", type: "QtIgnoredMacro")
+
+@attached(body)
+public macro QtSignal() = #externalMacro(module: "QtBridgeMacros", type: "QtSignalMacro")

@@ -26,8 +26,8 @@ public:
     void registerSlot(const char *name, void *builderPtr, int propertyId,
                       const std::vector<int> &argTypeIds, SlotFunc callback);
 
-    void registerSignal(const char *name);
-    void emitSignal(QObjectProxy sender, const char *name);
+    void registerSignal(const char *name, const std::vector<int> &argTypeIds);
+    void emitSignal(QObjectProxy sender, const char *name, const std::vector<QVariant> &args);
 
     using ReadFunc = QVariant(*)(int, void *, void *);
     using WriteFunc = bool(*)(int, void *, void *, const QVariant*);

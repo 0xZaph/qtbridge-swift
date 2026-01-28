@@ -24,6 +24,7 @@ public struct QtBridgeableMacro {
 
     static let trackedMacroName = "QtTracked"
     static let ignoredMacroName = "QtIgnored"
+    static let signalMacroName = "QtSignal"
 
     static let paramsListName = "QMetaParamsList"
 
@@ -114,10 +115,25 @@ public struct QtBridgeableMacro {
         return t.hasPrefix("QListModel<") && t.hasSuffix(">")
     }
 
-    private static func processFunctionDeclaration(className : String,
-                                                   functionDecl: FunctionDeclSyntax,
-                                                   into registrationsArr: inout [String],
-                                                   methodCounter : inout Int) -> Void
+    private static func buildArgTypes(params: FunctionParameterListSyntax,
+                                      arrayName: String) -> (arrayInit: String, pushCalls: [String])?
+    {
+        var pushCalls: [String] = []
+
+        for param in params {
+            let paramType = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard isSupportedBasicType(type: paramType) else { return nil }
+            pushCalls.append("\(arrayName).append(\(paramType).self)")
+        }
+
+        let arrayVar = pushCalls.isEmpty ? "let" : "var"
+        let arrayInit = "\(arrayVar) \(arrayName) : [QVariantGettable.Type] = []"
+        return (arrayInit, pushCalls)
+    }
+
+    private static func processSignalDeclaration(functionDecl: FunctionDeclSyntax,
+                                                 into registrationsArr: inout [String],
+                                                 signalCounter: inout Int)
     {
         guard functionDecl.isValidForRegistration else {
             return
@@ -127,38 +143,57 @@ public struct QtBridgeableMacro {
             return
         }
 
+        let signalName = functionDecl.name.text
+        let params = functionDecl.signature.parameterClause.parameters
+        let arrayName = "signalArgTypes\(signalCounter)"
+
+        guard let (arrayInit, pushCalls) = buildArgTypes(params: params, arrayName: arrayName) else {
+            return
+        }
+
+        registrationsArr.append(
+        """
+        \(arrayInit)
+        \(pushCalls.joined(separator: "\n"))
+        builder.registerSignal(signalName: "\(signalName)", argTypes: \(arrayName))
+        """)
+        signalCounter += 1
+    }
+
+    private static func processFunctionDeclaration(className : String,
+                                                   functionDecl: FunctionDeclSyntax,
+                                                   into registrationsArr: inout [String],
+                                                   methodCounter : inout Int) -> Void
+    {
+        guard functionDecl.isValidForRegistration else {
+            return
+        }
+
+        if functionDecl.hasAttribute(QtBridgeableMacro.ignoredMacroName)
+            || functionDecl.hasAttribute(QtBridgeableMacro.signalMacroName) {
+            return
+        }
+
         let methodName = functionDecl.name.text
         let params = functionDecl.signature.parameterClause.parameters
 
         let arrayName = "argTypes\(methodCounter)"
 
-        var pushCalls: [String] = []
+        guard let (arrayInit, pushCalls) = buildArgTypes(params: params, arrayName: arrayName) else {
+            return
+        }
+
         var paramExtraction: [String] = []
         var args: [String] = []
 
-        var isSupported = true
         for (index, param) in params.enumerated() {
             let paramName = param.firstName.text
             let paramType = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            guard isSupportedBasicType(type: paramType) else {
-                isSupported = false
-                break
-            }
-
-            pushCalls.append("\(arrayName).append(\(paramType).self)")
 
             let extractor = "let \(paramName) : \(paramType) = args.get(\(index))"
             paramExtraction.append(extractor)
             args.append("\(paramName): \(paramName)")
         }
-
-        guard isSupported else {
-            return
-        }
-
-        let arrayVar = pushCalls.isEmpty ? "let" : "var"
-        let arrayInit = "\(arrayVar) \(arrayName) : [QVariantGettable.Type] = []"
 
         let call = args.isEmpty
             ? "self.\(methodName)()"
@@ -283,11 +318,20 @@ extension QtBridgeableMacro : MemberMacro {
         declarations.append(QtBridgeableMacro.builderVariable(className: typeName))
 
         var registrations: [String] = []
-        var nMethods = 1
+        var nSignals = 1
+        var nSlots = 1
+        // Signals must be registered first
+        for member in classDecl.memberBlock.members {
+            guard let functionDecl = member.decl.as(FunctionDeclSyntax.self) else { continue }
+            if functionDecl.hasAttribute(QtBridgeableMacro.signalMacroName) {
+                processSignalDeclaration(functionDecl: functionDecl, into: &registrations, signalCounter: &nSignals)
+            }
+        }
+
         for member in classDecl.memberBlock.members {
             if let functionDecl = member.decl.as(FunctionDeclSyntax.self) {
                 processFunctionDeclaration(className: typeName, functionDecl: functionDecl,
-                                           into: &registrations, methodCounter: &nMethods)
+                                           into: &registrations, methodCounter: &nSlots)
             } else if let variableDecl = member.decl.as(VariableDeclSyntax.self) {
                 processVariableDeclaration(className: typeName, variableDecl: variableDecl,
                                            into: &registrations)
@@ -381,11 +425,63 @@ public struct QtIgnoredMacro: PeerMacro {
     }
 }
 
+public struct QtSignalMacro: BodyMacro {
+    public static func expansion(
+        of node: SwiftSyntax.AttributeSyntax,
+        providingBodyFor declaration: some SwiftSyntax.DeclSyntaxProtocol
+        & SwiftSyntax.WithOptionalCodeBlockSyntax,
+        in context: some SwiftSyntaxMacros.MacroExpansionContext
+    ) throws -> [SwiftSyntax.CodeBlockItemSyntax] {
+        guard let funcDecl = declaration.as(FunctionDeclSyntax.self) else {
+            throw DiagnosticsError(syntax: node,
+                                   message: "'@QtSignal' can only be applied to functions",
+                                   id: .invalidApplication)
+        }
+
+        if funcDecl.body != nil {
+            throw DiagnosticsError(syntax: node,
+                                   message: "'@QtSignal' functions must not have a body",
+                                   id: .invalidApplication)
+        }
+
+        guard funcDecl.isValidForRegistration else {
+            throw DiagnosticsError(syntax: node,
+                                   message: "'@QtSignal' functions must not be private or static",
+                                   id: .invalidApplication)
+        }
+
+        let name = funcDecl.name.text
+        let params = funcDecl.signature.parameterClause.parameters
+
+        var argType: [String] = []
+        for param in params {
+            let paramType = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard QtBridgeableMacro.isSupportedBasicType(type: paramType) else {
+                throw DiagnosticsError(syntax: node,
+                                       message: "Unsupported parameter type: \(paramType)",
+                                       id: .invalidApplication)
+            }
+            let paramName = param.firstName.text
+            argType.append("\(paramName).toVariant()")
+        }
+
+        let argsArray = argType.isEmpty ? "[]" : "[\(argType.joined(separator: ", "))]"
+
+        return [
+            """
+            emitSignal(signalName: "\(raw: name)", args: \(raw: argsArray))
+            """
+        ]
+    }
+}
+
+
 @main
 struct QtBridgePackagePlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         QtBridgeableMacro.self,
         QtTrackedMacro.self,
-        QtIgnoredMacro.self
+        QtIgnoredMacro.self,
+        QtSignalMacro.self
     ]
 }

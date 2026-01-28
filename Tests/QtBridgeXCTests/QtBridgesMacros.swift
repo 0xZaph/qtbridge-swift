@@ -11,7 +11,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
     private let macros: [String: Macro.Type] = [
         "QtBridgeable": QtBridgeableMacro.self,
         "QtTracked": QtTrackedMacro.self,
-        "QtIgnored": QtIgnoredMacro.self
+        "QtIgnored": QtIgnoredMacro.self,
+        "QtSignal": QtSignalMacro.self
     ]
 
     func testQtBridgeableOnUnsupportedTypeEmitsError() {
@@ -426,6 +427,138 @@ final class QtBridgeableExpansionTest: XCTestCase {
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
+            indentationWidth: .spaces(4)
+        )
+    }
+
+    func testQSignalMacroExpansionNoParams() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class TestModel {
+                @QtSignal
+                func mySignal()
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                func mySignal() {
+                    emitSignal(signalName: "mySignal", args: [])
+                }
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "TestModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+                    let signalArgTypes1 : [QVariantGettable.Type] = []
+
+                    builder.registerSignal(signalName: "mySignal", argTypes: signalArgTypes1)
+                }
+            }
+            """,
+            macros: macros,
+            indentationWidth: .spaces(4)
+        )
+    }
+
+    func testQSignalMacroExpansionWithParams() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class TestModel {
+                @QtSignal
+                func mySignal(text: String)
+
+                @QtSignal
+                func mySignal2(intParam: Int, boolParam: Bool, doubleParam: Double)
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                func mySignal(text: String) {
+                    emitSignal(signalName: "mySignal", args: [text.toVariant()])
+                }
+                func mySignal2(intParam: Int, boolParam: Bool, doubleParam: Double) {
+                    emitSignal(signalName: "mySignal2", args: [intParam.toVariant(), boolParam.toVariant(), doubleParam.toVariant()])
+                }
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "TestModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+                    var signalArgTypes1 : [QVariantGettable.Type] = []
+                    signalArgTypes1.append(String.self)
+                    builder.registerSignal(signalName: "mySignal", argTypes: signalArgTypes1)
+
+                    var signalArgTypes2 : [QVariantGettable.Type] = []
+                    signalArgTypes2.append(Int.self)
+                    signalArgTypes2.append(Bool.self)
+                    signalArgTypes2.append(Double.self)
+                    builder.registerSignal(signalName: "mySignal2", argTypes: signalArgTypes2)
+                }
+            }
+            """,
+            macros: macros,
+            indentationWidth: .spaces(4)
+        )
+    }
+
+    func testQtSignalWithFunctionBody() {
+        assertMacroExpansion(
+            """
+            public class TestModel {
+                @QtSignal
+                func mySignal() {
+                    print("Signal!")
+                }
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                func mySignal() {
+                    print("Signal!")
+                }
+            }
+            """,
+            diagnostics: [
+                .init(
+                    message: "'@QtSignal' functions must not have a body",
+                    line: 2, column: 5, severity: .error
+                )
+            ],
+            macros: macros,
+            indentationWidth: .spaces(4)
+        )
+    }
+
+    func testQtSignalUnSupportedParameterType() {
+        assertMacroExpansion(
+            """
+            public class TestModel {
+                @QtSignal
+                func mySignal(someVar: Any)
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                func mySignal(someVar: Any)
+            }
+            """,
+            diagnostics: [
+                .init(
+                    message: "Unsupported parameter type: Any",
+                    line: 2, column: 5, severity: .error
+                )
+            ],
+            macros: macros,
             indentationWidth: .spaces(4)
         )
     }

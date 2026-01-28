@@ -18,6 +18,10 @@ extension QObjectBuildable {
     public func emitSignal(for propertyName: String) {
         Self.self.metaObjectBuilder.emitSignal(sender: self, for: propertyName)
     }
+
+    public func emitSignal(signalName: String, args: [QVariant] = []) {
+        Self.metaObjectBuilder.emitSignal(sender: self, signalName: signalName, args: args)
+    }
 }
 
 extension QObjectBuildable {

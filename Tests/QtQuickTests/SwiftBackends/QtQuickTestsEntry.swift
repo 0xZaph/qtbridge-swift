@@ -16,6 +16,7 @@ public func runQtQuickTests() -> Int32 {
 
     // Tests are run in alphabetical order based on "name" set in TestCase in tst_*.qml file,
     // so for clarity, new tests should be added in the same way below:
+    let signalsModel = SignalsModel()
     let customQListModel = PhoneBookModel()
     let listModel = ListModel()
     let simpleQListModel = SimpleQListModel()
@@ -31,6 +32,10 @@ public func runQtQuickTests() -> Int32 {
     qTestApp.registerQmlSingleton("QtBridgeTest", 1, 0,
                                  "SimpleQListModel",
                                   simpleQListModel.objectHolder.proxy)
+
+    qTestApp.registerQmlSingleton("QtBridgeTest", 1, 0,
+                                 "SignalsModel",
+                                  signalsModel.objectHolder.proxy)
 
     let qmlDir = Bundle.module.url(forResource: "qml", withExtension: nil)!
     qTestApp.setInputDir(qmlDir.path)

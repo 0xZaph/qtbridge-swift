@@ -13,6 +13,7 @@
 
 using CppVectorOfStrings = std::vector<std::string>;
 using CppVectorOfInt = std::vector<int>;
+using CppVectorOfQVariant = std::vector<QVariant>;
 
 class MetaParamsList
 {

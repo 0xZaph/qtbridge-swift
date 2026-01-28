@@ -93,6 +93,12 @@ public:
         QMetaMethod method = m_metaObject->method(id);
         switch (method.methodType())
         {
+        case QMetaMethod::Signal:
+        {
+            QMetaObject::activate(o, id, argv);
+            return true;
+        }
+        break;
         case QMetaMethod::Slot:
         {
             auto slotIt = m_slots.find(methodId);
@@ -186,12 +192,13 @@ public:
         m_slots.emplace(localId, info);
     }
 
-    void registerSignal(const std::string &name)
+    void registerSignal(const std::string &name, const std::vector<int> &argTypeIds)
     {
         if (!m_metaObjectBuilder)
             throw std::runtime_error("Signal registration must be done before endMetaRegistration() call");
 
-        QByteArray signature = generateFuncSignature(name, {});
+        const std::vector<QMetaType> metaTypes(argTypeIds.begin(), argTypeIds.end());
+        QByteArray signature = generateFuncSignature(name, metaTypes);
         QMetaMethodBuilder builder = m_metaObjectBuilder->addSignal(signature);
         const int localId = builder.index();
         auto [_, added] = m_signalNameToId.emplace(name, localId);
@@ -262,10 +269,46 @@ public:
         return method;
     }
 
-    void emitSignal(QObject* obj, const std::string &name)
+    void emitSignal(QObject* obj, const std::string &name, const std::vector<QVariant> &args)
     {
-        if (auto it = m_signalNameToId.find(name); it != m_signalNameToId.end())
-            QMetaObject::activate(obj, m_metaObject.get(), it->second, nullptr);
+        auto it = m_signalNameToId.find(name);
+        if (it == m_signalNameToId.end())
+            return;
+
+        QMetaMethod signal = metaMethod(it->second);
+        const int signalIndex = signal.methodIndex();
+
+        if (signalIndex < 0)
+            return;
+
+        QMetaMethod metaMethod = m_metaObject->method(signalIndex);
+
+        if (metaMethod.parameterCount() != int(args.size()))
+            throw std::logic_error("Signal argument count mismatch");
+
+        std::vector<QVariant> convertedArgs;
+        const size_t argsSize = args.size();
+        convertedArgs.reserve(argsSize);
+
+        for (size_t i = 0; i < argsSize; ++i) {
+            QMetaType paramMetaType = metaMethod.parameterMetaType(static_cast<int>(i));
+            QVariant v = args[i];
+            if (v.metaType() != paramMetaType && !v.convert(paramMetaType))
+                throw std::runtime_error("Failed to convert signal argument");
+            convertedArgs.push_back(std::move(v));
+        }
+
+        QMetaObject::invokeMethod(obj, [obj, signalIndex, args = std::move(convertedArgs)]() mutable {
+            std::vector<void*> argv;
+            argv.reserve(args.size() + 1);
+            argv.push_back(nullptr); // Signal return value
+
+            for (auto &arg : args) {
+                argv.push_back(arg.data());
+            }
+
+            QMetaObject::activate(obj, signalIndex, argv.data());
+        }, Qt::QueuedConnection);
     }
 
 private:
@@ -323,14 +366,14 @@ void SwiftMetaObjectBuilder::registerSlot(const char *name,
     m_impl->registerSlot(name, propertyId, argTypeIds, builderPtr, callback);
 }
 
-void SwiftMetaObjectBuilder::registerSignal(const char *name)
+void SwiftMetaObjectBuilder::registerSignal(const char *name, const std::vector<int> &argTypeIds)
 {
-    m_impl->registerSignal(name);
+    m_impl->registerSignal(name, argTypeIds);
 }
 
-void SwiftMetaObjectBuilder::emitSignal(QObjectProxy sender, const char *name)
+void SwiftMetaObjectBuilder::emitSignal(QObjectProxy sender, const char *name, const std::vector<QVariant> &args)
 {
-    m_impl->emitSignal(sender.toObject(), name);
+    m_impl->emitSignal(sender.toObject(), name, args);
 }
 
 void SwiftMetaObjectBuilder::registerProperty(const char *name, void *builderPtr,
