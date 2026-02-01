@@ -6,8 +6,11 @@ import Foundation
 let useLocalQt: Bool = false
 let useLocal: Bool = envVar("QTBRIDGE_USE_LOCAL_QT_PACKAGE", useLocalQt)
 
+// This is separated to be extracted via CMake
+let swiftSyntaxVersion: Version = "600.0.0"
+
 let dependencies: [Package.Dependency] = [
-    .package(url: "https://github.com/apple/swift-syntax.git", from: "600.0.0"),
+    .package(url: "https://github.com/apple/swift-syntax.git", from: swiftSyntaxVersion),
 
     useLocal ? .package(path: "../Qt")
     : .package(url: "https://git.qt.io/qtbridge/qtforswift.git", branch: "master")
@@ -30,6 +33,9 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+            ],
+            exclude: [
+                "CMakeLists.txt"
             ]
         ),
         .target(
@@ -40,6 +46,9 @@ let package = Package(
                 .product(name: "QtQml", package: qtPackageName),
                 .product(name: "QtGui", package: qtPackageName),
                 .product(name: "QtTest", package: qtPackageName)
+            ],
+            exclude: [
+                "CMakeLists.txt"
             ]
         ),
         .target(
@@ -51,6 +60,9 @@ let package = Package(
                 .product(name: "QtQml", package: qtPackageName),
                 .product(name: "QtGui", package: qtPackageName),
                 .product(name: "QmlImports", package: qtPackageName)
+            ],
+            exclude: [
+                "CMakeLists.txt"
             ],
             swiftSettings: [
                 .interoperabilityMode(.Cxx),
