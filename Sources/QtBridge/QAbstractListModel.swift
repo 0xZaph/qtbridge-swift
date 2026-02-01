@@ -68,7 +68,7 @@ public final class QAbstractListModel {
 
     internal func bind<Owner: AnyObject, Element>(owner: Owner,
                                                   keyPath: ReferenceWritableKeyPath<Owner, [Element]>) {
-        weak let weakOwner = owner
+        weak var weakOwner = owner
 
         count = { [weak weakOwner] in
             guard let weakOwner else { return 0 }

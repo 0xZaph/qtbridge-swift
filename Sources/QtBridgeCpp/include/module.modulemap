@@ -1,0 +1,14 @@
+module QtBridgeCpp {
+    header "abstractitemmodel.h"
+    header "abstractlistmodel.h"
+    header "callbackbase.h"
+    header "metaparamslist.h"
+    header "qappcpp.h"
+    header "qobjectproxy.h"
+    header "qtestappcpp.h"
+    header "swiftmetaobjectbuilder.h"
+    header "swiftobjectaccesor.h"
+    
+    requires cplusplus
+    export *
+}
