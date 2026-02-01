@@ -68,13 +68,15 @@ public final class QAbstractListModel {
 
     internal func bind<Owner: AnyObject, Element>(owner: Owner,
                                                   keyPath: ReferenceWritableKeyPath<Owner, [Element]>) {
-        count = { [weak owner] in
-            guard let owner else { return 0 }
-            return owner[keyPath: keyPath].count
+        weak var weakOwner = owner
+
+        count = { [weak weakOwner] in
+            guard let weakOwner else { return 0 }
+            return weakOwner[keyPath: keyPath].count
         }
-        elementAt = { [weak owner] idx in
-            guard let owner else { return () }
-            return owner[keyPath: keyPath][idx] as Any
+        elementAt = { [weak weakOwner] idx in
+            guard let weakOwner else { return () }
+            return weakOwner[keyPath: keyPath][idx] as Any
         }
 
         roles.removeAll()
@@ -89,11 +91,11 @@ public final class QAbstractListModel {
         }
         // Basic types
         if Element.self is QVariantSettable.Type {
-            replaceAt = { [weak owner] idx, variant in
-                guard let owner else { return false }
+            replaceAt = { [weak weakOwner] idx, variant in
+                guard let ownerClass = weakOwner else { return false }
                 guard let T = Element.self as? QVariantSettable.Type else { return false }
                 let value: Any = T.value(from: variant)
-                owner[keyPath: keyPath][idx] = value as! Element
+                ownerClass[keyPath: keyPath][idx] = value as! Element
                 return true
             }
         } else {

@@ -5,6 +5,7 @@ import SwiftCompilerPlugin
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
+import Foundation
 
 public struct QtBridgeableMacro {
     static let moduleName = "QtBridge"

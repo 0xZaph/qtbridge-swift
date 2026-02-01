@@ -3,7 +3,10 @@
 
 import Foundation
 import QtBridgeCpp
+#if !CMAKE
 import QmlImports
+
+#endif
 
 public class QMLApp {
     var qmlApp: QAppCpp
@@ -47,8 +50,10 @@ public class QMLApp {
         let qApp = Self()
         let app = QMLApp()
 
+        #if !CMAKE
         app.setImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         app.setPluginsPath(path: Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
+        #endif
 
         for (name, property) in qApp.initialProperties {
             property.addInitialProperty(to: app, name: name)

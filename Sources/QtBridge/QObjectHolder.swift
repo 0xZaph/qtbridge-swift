@@ -5,7 +5,7 @@ import Foundation
 import QtBridgeCpp
 
 public class QObjectHolder {
-    package var proxy: QObjectProxy
+    internal var proxy: QObjectProxy
     internal weak var owner: (QObjectBuildable)?
 
     public init(owner: QObjectBuildable) {
