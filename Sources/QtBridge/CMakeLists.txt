@@ -54,6 +54,16 @@ target_compile_options(QtBridge PUBLIC
     "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>"
 )
 
+if(DEFINED QTBRIDGE_SWIFT_BRIDGING_INCLUDE)
+    target_compile_options(QtBridge PUBLIC
+        "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>"
+        "$<$<COMPILE_LANGUAGE:Swift>:-I${QTBRIDGE_SWIFT_BRIDGING_INCLUDE}>"
+    )
+    target_include_directories(QtBridge PUBLIC
+        "$<$<COMPILE_LANGUAGE:CXX>:${QTBRIDGE_SWIFT_BRIDGING_INCLUDE}>"
+    )
+endif()
+
 target_compile_options(QtBridge PRIVATE
     "$<$<COMPILE_LANGUAGE:Swift>:-DCMAKE>"
 )
