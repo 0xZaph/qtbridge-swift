@@ -5,17 +5,6 @@ cmake_minimum_required(VERSION 3.29)
 
 project(ChatApp LANGUAGES CXX Swift)
 
-# Function to copy files for resource usage
-function(copy_resource FILE_PATH DESTINATION)
-    get_filename_component(FILENAME ${FILE_PATH} NAME)
-    add_custom_command(
-        TARGET ChatApp POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${DESTINATION}
-        COMMAND ${CMAKE_COMMAND} -E copy ${FILE_PATH} ${DESTINATION}/${FILENAME}
-        COMMENT "Copying resource ${FILENAME}"
-    )
-endfunction()
-
 add_executable(ChatApp
     Sources/ChatApp.swift
     Sources/ChatModel.swift
@@ -47,6 +36,11 @@ if(APPLE)
         MACOSX_PACKAGE_LOCATION Resources
     )
 else()
-    # Non-bundle: Copy next to executable
-    copy_resource("${CHAT_APP_QML_FILE}" "${CMAKE_BINARY_DIR}/bin")
+    add_custom_command(
+        TARGET ChatApp POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "${CHAT_APP_QML_FILE}"
+            "$<TARGET_FILE_DIR:ChatApp>/chatUI.qml"
+        COMMENT "Copying QML file next to executable"
+    )
 endif()
