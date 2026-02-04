@@ -16,20 +16,8 @@ set(QTBRIDGE_SWIFT_SOURCES
     QtBridgesMacros.swift
 )
 
-set(QTBRIDGE_CPP_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/abstractitemmodel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/abstractlistmodel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/callbackbase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/metaparamslist.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/qappcpp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/qobjectproxy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/qtestappcpp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/swiftmetaobjectbuilder.cpp
-)
-
 add_library(QtBridge
     ${QTBRIDGE_SWIFT_SOURCES}
-    ${QTBRIDGE_CPP_SOURCES}
 )
 
 if(WIN32)
@@ -45,6 +33,7 @@ endif()
 
 target_link_libraries(QtBridge
     PUBLIC
+        QtBridgeCpp
         Qt6::Core
         Qt6::Gui
         Qt6::Qml
@@ -57,9 +46,6 @@ set_target_properties(QtBridge PROPERTIES
     AUTOMOC ON
 )
 
-target_include_directories(QtBridge PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtBridgeCpp/include
-)
 
 target_compile_options(QtBridge PUBLIC
     "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>"
