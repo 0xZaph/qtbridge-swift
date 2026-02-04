@@ -18,6 +18,36 @@ FetchContent_Declare(SwiftSyntax
 )
 FetchContent_MakeAvailable(SwiftSyntax)
 
+if(WIN32)
+  # swiftc on Windows expects a lib-prefixed import library; copy the built lib accordingly
+  set(_qtbridge_swiftsyntax_lib_targets
+        SwiftSyntax
+        SwiftSyntaxMacros
+        SwiftCompilerPlugin
+        SwiftCompilerPluginMessageHandling
+        SwiftSyntaxMacroExpansion
+        SwiftSyntaxBuilder
+        SwiftParserDiagnostics
+        SwiftBasicFormat
+        SwiftOperators
+        SwiftParser
+        SwiftDiagnostics
+        SwiftIDEUtils
+        SwiftLibraryPluginProvider
+    )
+  foreach(_t IN LISTS _qtbridge_swiftsyntax_lib_targets)
+    if(TARGET ${_t})
+      add_custom_target(_qtbridge_copy_${_t} ALL
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${_t}>"
+                    "$<TARGET_FILE_DIR:${_t}>/lib$<TARGET_FILE_BASE_NAME:${_t}>$<TARGET_FILE_SUFFIX:${_t}>"
+                DEPENDS ${_t}
+                COMMENT "Copy ${_t} to lib-prefixed import lib for Windows"
+            )
+    endif()
+  endforeach()
+endif()
+
 add_executable(QtBridgeMacros
     Extensions.swift
     QtBridgeableMacro.swift

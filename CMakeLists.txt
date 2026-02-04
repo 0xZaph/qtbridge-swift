@@ -8,7 +8,7 @@ project(QtBridge
     LANGUAGES CXX Swift
 )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -76,7 +76,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Build QtBridgeMacros via ExternalProject (must build for host, not target)
 include(ExternalProject)
+set(QTBRIDGE_MACROS_EP_ROOT "${CMAKE_BINARY_DIR}/qtbridge_macros_ep")
 ExternalProject_Add(QtBridgeMacros_External
+    PREFIX "${QTBRIDGE_MACROS_EP_ROOT}"
+    BINARY_DIR "${QTBRIDGE_MACROS_EP_ROOT}/build"
+    STAMP_DIR "${QTBRIDGE_MACROS_EP_ROOT}/stamp"
+    TMP_DIR "${QTBRIDGE_MACROS_EP_ROOT}/tmp"
+    DOWNLOAD_DIR "${QTBRIDGE_MACROS_EP_ROOT}/download"
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Sources/QtBridgeMacros"
     CMAKE_ARGS
         -G Ninja

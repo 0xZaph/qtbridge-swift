@@ -32,6 +32,17 @@ add_library(QtBridge
     ${QTBRIDGE_CPP_SOURCES}
 )
 
+if(WIN32)
+  # swiftc on Windows expects a lib-prefixed import library; copy the built lib accordingly
+  add_custom_target(QtBridge_libprefix ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:QtBridge>"
+            "$<TARGET_FILE_DIR:QtBridge>/lib$<TARGET_FILE_BASE_NAME:QtBridge>$<TARGET_FILE_SUFFIX:QtBridge>"
+        DEPENDS QtBridge
+        COMMENT "Copy QtBridge.lib to libQtBridge.lib for swiftc"
+    )
+endif()
+
 target_link_libraries(QtBridge
     PUBLIC
         Qt6::Core
@@ -52,14 +63,16 @@ target_include_directories(QtBridge PUBLIC
 
 target_compile_options(QtBridge PUBLIC
     "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>"
+    "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>"
+    "$<$<COMPILE_LANGUAGE:Swift>:-std=c++20>"
 )
 
 if(DEFINED QTBRIDGE_SWIFT_BRIDGING_INCLUDE)
-    target_compile_options(QtBridge PUBLIC
+  target_compile_options(QtBridge PUBLIC
         "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>"
         "$<$<COMPILE_LANGUAGE:Swift>:-I${QTBRIDGE_SWIFT_BRIDGING_INCLUDE}>"
     )
-    target_include_directories(QtBridge PUBLIC
+  target_include_directories(QtBridge PUBLIC
         "$<$<COMPILE_LANGUAGE:CXX>:${QTBRIDGE_SWIFT_BRIDGING_INCLUDE}>"
     )
 endif()
@@ -73,7 +86,7 @@ add_dependencies(QtBridge QtBridgeMacros)
 
 # Add macro plugin path for the Swift compiler
 if(DEFINED QTBRIDGE_MACROS_PLUGIN_PATH)
-    target_compile_options(QtBridge PUBLIC
+  target_compile_options(QtBridge PUBLIC
         "$<$<COMPILE_LANGUAGE:Swift>:-load-plugin-executable>"
         "$<$<COMPILE_LANGUAGE:Swift>:${QTBRIDGE_MACROS_PLUGIN_PATH}>"
     )
