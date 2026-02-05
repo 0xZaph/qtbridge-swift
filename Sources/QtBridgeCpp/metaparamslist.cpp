@@ -12,6 +12,12 @@ MetaParamsList::MetaParamsList(
 {
 }
 
+MetaParamsList::MetaParamsList(const MetaParamsList& other)
+    : m_method(other.m_method),
+      m_paramData(other.m_paramData)
+{
+}
+
 int MetaParamsList::size() const
 {
     return m_method.parameterCount();

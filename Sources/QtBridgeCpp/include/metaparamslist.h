@@ -18,6 +18,7 @@ class MetaParamsList
 {
 public:
     MetaParamsList(const QMetaMethod& method, void** paramData);
+    MetaParamsList(const MetaParamsList& other);
     ~MetaParamsList() = default;
 
     int size() const;
