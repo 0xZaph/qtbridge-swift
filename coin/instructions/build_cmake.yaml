@@ -1,0 +1,27 @@
+type: Group
+instructions:
+  - type: ChangeDirectory
+    directory: "{{.SourceDir}}"
+  - type: MakeDirectory
+    directory: .git
+  - type: MakeDirectory
+    directory: "{{.SourceDir}}_build"
+  - type: SetBuildDirectory
+    directory: "{{.SourceDir}}_build"
+  - type: ChangeDirectory
+    directory: "{{.BuildDir}}"
+
+  - type: ExecuteCommand
+    command: "cmake -G Ninja {{.SourceDir}} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX={{.InstallDir}} -DQt6_ROOT=/home/qt/work/install"
+    maxTimeInSeconds: 6000
+    maxTimeBetweenOutput: 1200
+    userMessageOnFailure: >
+      Failed to configure with CMake.
+
+  - type: ExecuteCommand
+    command: "cmake --build . --parallel -v"
+    maxTimeInSeconds: 6000
+    maxTimeBetweenOutput: 1200
+    userMessageOnFailure: >
+      Failed to build sources.
+
