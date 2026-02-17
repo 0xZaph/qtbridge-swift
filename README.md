@@ -40,17 +40,26 @@ Notable limitations include:
 
 ## Supported platforms
 
-Currently, only **macOS (Apple Silicon)** is supported, with plans to extend support in the future.
+Currently, **macOS (Apple Silicon)** and **Linux (x86_64, aarch64)** are supported, with plans to extend support in the future.
 
 ## Requirements
 
-- **macOS 14** or later
+### Swift
 - **Swift 6.0** or later
+
+### For Swift Package Manager builds
+- **macOS 14** or later
 - [Xcode](https://developer.apple.com/xcode/) or [Swift Package Manager](https://github.com/swiftlang/swift-package-manager)
+
+### For CMake builds
+- **macOS 14** or later (for macOS) or **Linux**
+- [CMake](https://cmake.org/) **3.22** or later
+- [Ninja](https://ninja-build.org/)
+- [Qt](https://www.qt.io/) **6.10** or later
 
 ## Installing Qt Bridge
 
-Qt Bridge is distributed as a Swift Package Manager package. You can add it to your project as a package dependency using either a local package reference or the repository URL.
+Qt Bridge can be added to your project via Swift Package Manager or CMake.
 
 ### Importing Qt Bridge as a remote package
 
@@ -71,7 +80,7 @@ Qt Bridge is distributed as a Swift Package Manager package. You can add it to y
 3. Enable Swift-C++ interoperability in *swiftSettings* with .*interoperabilityMode(.Cxx)* mode.
 ```
 dependencies: [
-    .package(url: "https://github.com/qt/qtbridge-swift", exact: "0.1.0-alpha")
+    .package(url: "https://github.com/qt/qtbridge-swift", exact: "0.1.1-alpha")
 ],
 targets: [
     .target(
@@ -86,14 +95,41 @@ targets: [
 ]
 ```
 
+#### Add via CMakeLists.txt
+
+For CMake-based projects, use `FetchContent` to fetch Qt Bridge from the repository:
+```cmake
+cmake_minimum_required(VERSION 3.22)
+project(MyApp LANGUAGES CXX Swift)
+
+add_executable(MyApp Sources/app.swift)
+
+include(FetchContent)
+FetchContent_Declare(QtBridge
+    GIT_REPOSITORY https://github.com/qt/qtbridge-swift.git
+    GIT_TAG 0.1.1-alpha
+)
+FetchContent_MakeAvailable(QtBridge)
+
+target_link_libraries(MyApp PRIVATE QtBridge)
+```
+
+Configure and build with Ninja:
+```sh
+cmake -G Ninja -B build
+cmake --build build
+```
+
+**Note:** Qt 6.10+ must be in your `PATH` or set via `CMAKE_PREFIX_PATH`.
+
 ### Importing Qt Bridge as a local package
 
 Firstly, clone the [Qt Bridge for Swift repo](https://github.com/qt/qtbridge-swift):
 
-```
-$ git clone https://github.com/qt/qtbridge-swift
-$ cd qtbridge-swift
-$ git checkout 0.1.0-alpha
+```sh
+git clone https://github.com/qt/qtbridge-swift
+cd qtbridge-swift
+git checkout 0.1.1-alpha
 ```
 
 #### Add via Xcode
@@ -129,6 +165,30 @@ targets: [
 ]
 ```
 
+#### Add via CMakeLists.txt
+
+For local development, point `FetchContent` at your local clone:
+```cmake
+cmake_minimum_required(VERSION 3.22)
+project(MyApp LANGUAGES CXX Swift)
+
+add_executable(MyApp Sources/app.swift)
+
+include(FetchContent)
+FetchContent_Declare(QtBridge
+    SOURCE_DIR "path/to/qtbridge-swift"
+)
+FetchContent_MakeAvailable(QtBridge)
+
+target_link_libraries(MyApp PRIVATE QtBridge)
+```
+Configure and build with Ninja:
+
+```sh
+cmake -G Ninja -B build
+cmake --build build
+```
+
 ### Disable Library Validation Entitlement
 
 When you use a Team in Xcode and enable automatic signing, Xcode may enable the
@@ -152,17 +212,30 @@ it, but disabling Library Validation alone is sufficient.
 
 **Examples** directory contains simple projects implemented with Qt Bridge. For instance, to build and run MinimalApp:
 
-```
-$ cd qtbridge-swift/Examples/MinimalApp
+### With Xcode
 
-$ xcodebuild \
+```sh
+cd qtbridge-swift/Examples/MinimalApp
+
+xcodebuild \
   -project MinimalApp.xcodeproj \
   -scheme MinimalApp \
   -destination 'platform=macOS' \
   -derivedDataPath build \
   build
 
-$ open build/Build/Products/Debug/MinimalApp.app
+open build/Build/Products/Debug/MinimalApp.app
+```
+
+### With CMake
+```sh
+cd qtbridge-swift/Examples/MinimalApp/MinimalApp
+cmake -G Ninja -B build
+cmake --build build
+
+# Run the application
+open build/MinimalApp.app   # macOS
+./build/MinimalApp          # Linux
 ```
 
 ## Using Xcode templates
