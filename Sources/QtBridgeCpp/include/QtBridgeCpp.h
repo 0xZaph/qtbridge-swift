@@ -9,6 +9,8 @@
 #include "metaparamslist.h"
 #include "qappcpp.h"
 #include "qobjectproxy.h"
+#include "qobjectproxyimpl.h"
 #include "qtestappcpp.h"
 #include "swiftmetaobjectbuilder.h"
 #include "swiftobjectaccesor.h"
+#include "swiftqmlelementbuilder.h"

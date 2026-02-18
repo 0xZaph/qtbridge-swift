@@ -12,15 +12,21 @@ public struct QtBridgeableMacro {
 
     static let conformanceName = "QObjectBuildable"
     static var qualifiedConformanceName: String {
-      return "\(moduleName).\(conformanceName)"
-    }
-    static var initalPropConformanceName: String {
-        return "\(moduleName).QmlInitialProperty"
+        return "\(moduleName).\(conformanceName)"
     }
 
     static var qtBridgeableConformanceType: TypeSyntax {
         "\(raw: qualifiedConformanceName)"
-      }
+    }
+
+    static let instantiableName = "QmlInstantiable"
+    static var qualifiedInstantiableName: String {
+        return "\(moduleName).\(instantiableName)"
+    }
+
+    static var instantiableConformanceType: TypeSyntax {
+        "\(raw: qualifiedInstantiableName)"
+    }
 
     static let trackedMacroName = "QtTracked"
     static let ignoredMacroName = "QtIgnored"
@@ -32,12 +38,19 @@ public struct QtBridgeableMacro {
     static var qualifiedHolderTypeName: String {
         return "\(moduleName).\(holderTypeName)"
     }
+    static let privateHolderVariableName = "_objectHolder"
     static let holderVariableName = "objectHolder"
-
+    static var privateHolderVariable : DeclSyntax {
+        return
+          """
+          private var \(raw: privateHolderVariableName): \(raw: qualifiedHolderTypeName)?
+          """
+    }
     static var holderVariable : DeclSyntax {
         return
           """
           public lazy var \(raw: holderVariableName): \(raw: qualifiedHolderTypeName) = {
+              if let object = \(raw: privateHolderVariableName) { return object }
               return \(raw: qualifiedHolderTypeName)(owner: self)
           }()
           """
@@ -90,6 +103,14 @@ public struct QtBridgeableMacro {
         public static func registerMethodsAndProperties(for builder: \(raw: qualifiedBuilderTypeName)) {
             builder.startRegistration(for: self)
             \(raw: registrations.joined(separator: "\n\n"))
+        }
+        """
+    }
+
+    static func registerMetaTypeInterfaceFunction(typeName: String) -> DeclSyntax {
+        return """
+        public static func registerMetaTypeInterface(for builder: \(raw: qualifiedBuilderTypeName)) {
+            builder.registerCreateFn(objectHolderPath: \\\(raw: typeName)._objectHolder)
         }
         """
     }
@@ -350,6 +371,7 @@ extension QtBridgeableMacro : MemberMacro {
         let typeName = identified.name.trimmed.text
 
         var declarations: [DeclSyntax] = []
+        declarations.append(QtBridgeableMacro.privateHolderVariable)
         declarations.append(QtBridgeableMacro.holderVariable)
         declarations.append(QtBridgeableMacro.builderVariable(className: typeName))
 
@@ -377,6 +399,7 @@ extension QtBridgeableMacro : MemberMacro {
         }
 
         declarations.append(registerMethodsAndPropertiesFunction(registrations: registrations))
+        declarations.append(registerMetaTypeInterfaceFunction(typeName: typeName))
         return declarations
     }
 }

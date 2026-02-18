@@ -5,6 +5,7 @@
 
 #include <QtCore/qobject.h>
 #include <QtCore/qvariant.h>
+#include <QtCore/qpointer.h>
 
 #include <memory>
 
@@ -12,12 +13,14 @@ class QObjectProxy
 {
 public:
     QObjectProxy(void *owner);
+    using DeleterFn = void (*)(void *swiftObj);
+    QObjectProxy(void *owner, void *addr, DeleterFn deleter);
     ~QObjectProxy();
 
     QObject *toObject() const;
     QVariant toVariant() const;
 
 private:
-    class QObjectProxyImpl;
-    std::shared_ptr<QObjectProxyImpl> m_obj;
+    class Impl;
+    std::shared_ptr<Impl> m_impl;
 };

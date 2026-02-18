@@ -8,7 +8,7 @@ import QtBridgeCpp
 // resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
 // For CMake builds, the equivalent resources come from the system Qt installation.
 import QmlImports
-#endif
+#endif // !QT_IS_CMAKE_BUILD
 
 internal class QMLApp {
     var qmlApp: QAppCpp
@@ -94,10 +94,14 @@ internal class QMLApp {
     /// an object whose type is annotated with the
     /// ``QtBridgeable()`` macro.
     var initialProperties: [String: QObjectBuildable] { get }
+
+    var instantiableTypes: [QmlInstantiable.Type] { get }
 }
 
 @MainActor public extension QApp {
     var bundle: Bundle { .main }
+    var initialProperties: [String: QObjectBuildable] { [:] }
+    var instantiableTypes: [QmlInstantiable.Type] { [] }
 
     /// Starts the application.
     ///
@@ -116,7 +120,11 @@ internal class QMLApp {
         // when using CMake.
         app.setImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         app.setPluginsPath(path: Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
-        #endif
+        #endif // !QT_IS_CMAKE_BUILD
+
+        for type in qApp.instantiableTypes {
+            type.registerQmlElement()
+        }
 
         for (name, property) in qApp.initialProperties {
             property.addInitialProperty(to: app, name: name)

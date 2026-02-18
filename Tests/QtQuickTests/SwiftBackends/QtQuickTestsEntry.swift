@@ -42,6 +42,10 @@ public func runQtQuickTests() -> Int32 {
                                  "SlotsModel",
                                   slotsModel.objectHolder.proxy)
 
+    // Qml instantiable types
+    QmlType1.registerQmlElement()
+    QmlType2.registerQmlElement()
+
     let qmlDir = Bundle.module.url(forResource: "qml", withExtension: nil)!
     qTestApp.setInputDir(qmlDir.path)
 

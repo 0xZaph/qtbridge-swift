@@ -8,6 +8,7 @@ set(QTBRIDGE_SWIFT_SOURCES
     QListModel.swift
     QMetaObjectBuilder.swift
     QMetaParamsList.swift
+    QmlInstantiable.swift
     QModelIndex.swift
     QNamespace.swift
     QObjectBuildable.swift

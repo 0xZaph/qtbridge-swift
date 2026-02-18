@@ -8,8 +8,10 @@ set(QTBRIDGE_CPP_SOURCES
     metaparamslist.cpp
     qappcpp.cpp
     qobjectproxy.cpp
+    qobjectproxyimpl.cpp
     qtestappcpp.cpp
     swiftmetaobjectbuilder.cpp
+    swiftqmlelementbuilder.cpp
 )
 
 add_library(QtBridgeCpp STATIC ${QTBRIDGE_CPP_SOURCES})

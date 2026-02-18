@@ -6,7 +6,7 @@
 #include <QtCore/qmetaobject.h>
 #include <QtCore/private/qmetaobjectbuilder_p.h>
 
-#include "swiftobjectaccesor.h"
+#include "qobjectproxyimpl.h"
 
 using namespace std::string_literals;
 
@@ -347,7 +347,7 @@ private:
 SwiftMetaObjectBuilder::SwiftMetaObjectBuilder(const char *className)
 {
     m_impl = std::make_shared<SwiftMetaObjectBuilder::BuilderImpl>(
-        &QObject::staticMetaObject,
+        &QObjectProxyImpl::staticMetaObject,
         className
     );
 }

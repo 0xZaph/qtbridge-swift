@@ -3,32 +3,55 @@
 
 #include "qobjectproxy.h"
 
-#include "swiftobjectaccesor.h"
+#include "qobjectproxyimpl.h"
 
-// QObjectProxyImpl
+// Impl
 
-class QObjectProxy::QObjectProxyImpl : public QObject,
-                                       public SwiftObjectAccesor
+class QObjectProxy::Impl
 {
 public:
-    QObjectProxyImpl(void * owner)
-        : m_owner(owner)
+    Impl(void *owner) :
+        m_ownership(Cpp),
+        m_object(new QObjectProxyImpl(owner))
     {
     }
 
-    // SwiftObjectAccessor
-    void* swiftObject() const
+    Impl(void *owner,
+         void *addr,
+         DeleterFn deleter) :
+        m_ownership(Qml),
+        m_object(new (addr) QObjectProxyImpl(owner, deleter))
     {
-        return m_owner;
     }
+
+    ~Impl()
+    {
+        if (m_ownership == Cpp)
+            delete m_object;
+    }
+
+    QObject * object() { return m_object; }
 
 private:
-    void *m_owner;
+    enum Ownership {
+        Cpp,
+        Qml
+    };
+
+    Ownership m_ownership;
+    QObject * m_object;
 };
 
 QObjectProxy::QObjectProxy(void *owner)
 {
-    m_obj = std::make_shared<QObjectProxyImpl>(owner);
+    m_impl = std::make_shared<QObjectProxy::Impl>(owner);
+}
+
+QObjectProxy::QObjectProxy(void *owner,
+                           void *addr,
+                           DeleterFn deleter)
+{
+    m_impl = std::make_shared<QObjectProxy::Impl>(owner, addr, deleter);
 }
 
 QObjectProxy::~QObjectProxy()
@@ -37,10 +60,10 @@ QObjectProxy::~QObjectProxy()
 
 QObject * QObjectProxy::toObject() const
 {
-    return m_obj.get();
+    return m_impl->object();
 }
 
 QVariant QObjectProxy::toVariant() const
 {
-    return QVariant::fromValue(m_obj.get());
+    return QVariant::fromValue(m_impl->object());
 }

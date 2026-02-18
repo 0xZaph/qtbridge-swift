@@ -1,8 +1,6 @@
 // Copyright (C) 2025 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only
 
-import Foundation
-
 /// A protocol that enables a type to be exposed to QML.
 ///
 /// Conforming to this protocol indicates that a type can be
@@ -31,7 +29,7 @@ public protocol QObjectBuildable : AnyObject,
     /// This method is implemented by ``QtBridgeable()`` macro.
     /// Don't call or implement it yourself.
     static func registerMethodsAndProperties(for builder: QMetaObjectBuilder) -> Void
-    static func registerQmlElement() -> Void
+    static func registerMetaTypeInterface(for builder: QMetaObjectBuilder) -> Void
 }
 
 extension QObjectBuildable {
@@ -69,11 +67,4 @@ extension QObjectBuildable {
 extension QObjectBuildable {
     public func toVariant() -> QVariant { QVariant(value: self) }
     public static func metaType() -> Int32 { return 39 }
-}
-
-extension QObjectBuildable {
-    public static func registerQmlElement() -> Void {
-        // TODO: Implement instantiable types
-    }
-
 }

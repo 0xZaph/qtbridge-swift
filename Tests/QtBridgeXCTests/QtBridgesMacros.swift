@@ -58,6 +58,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 @QtTracked
                 var someVar: [String] = ["test String"]
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -69,6 +71,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestModel.someVar
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
@@ -109,6 +113,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     self.name = name
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestType"))
@@ -120,6 +126,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestType.name
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestType"))
             }
             public class TestModel {
                 var someVar: [String] = ["test String"] {
@@ -134,6 +142,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 }
 
                 var userTypeNotTracked: [TestType] = []
+
+                \(QtBridgableOutputs.privateHolderVar)
 
                 \(QtBridgableOutputs.holderVar)
 
@@ -151,6 +161,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                         keyPath: \\TestModel.userType
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -221,6 +233,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
             public class TestModel {
                 var someVar: [String] = ["test String"]
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -229,6 +243,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -253,6 +269,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 private var somePrivate: [String] = ["test String"]
                 static var someStatic: [String] = ["test String"]
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -264,6 +282,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     keyPath: \\TestModel.someConst
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -305,6 +325,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 var someArray: [String] = ["some Array"]
                 @QtTracked
                 var someArrayTwo: Array<String> = ["some Array"]
+
+                \(QtBridgableOutputs.privateHolderVar)
 
                 \(QtBridgableOutputs.holderVar)
 
@@ -352,6 +374,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                         keyPath: \\TestModel.someArrayTwo
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
@@ -416,6 +440,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 var someCharList: [Character] = ["M", "L"]
                 var someAnyList: [Any] = ["M", 13]
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -424,6 +450,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: ["QtBridgeable": QtBridgeableMacro.self],
@@ -447,6 +475,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     emitSignal(signalName: "mySignal", args: [])
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -457,6 +487,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
 
                     builder.registerSignal(signalName: "mySignal", argTypes: signalArgTypes1)
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -486,6 +518,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     emitSignal(signalName: "mySignal2", args: [intParam.toVariant(), boolParam.toVariant(), doubleParam.toVariant()])
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -502,6 +536,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     signalArgTypes2.append(Double.self)
                     builder.registerSignal(signalName: "mySignal2", argTypes: signalArgTypes2)
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -604,6 +640,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     implicitVoid()
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -687,6 +725,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                         return QVariant()
                     })
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -711,6 +751,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     return first + second
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -719,6 +761,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,

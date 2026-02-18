@@ -12,6 +12,15 @@ public class QObjectHolder {
     package var proxy: QObjectProxy
     internal weak var owner: (QObjectBuildable)?
 
+    public init(owner: QObjectBuildable,
+                ptr: UnsafeMutableRawPointer,
+                deleter: @escaping @convention(c) (UnsafeMutableRawPointer?) -> Void)
+    {
+        self.owner = owner
+        self.proxy = QObjectProxy(QObjectHolder.bridge(owner), ptr, deleter)
+        type(of: owner).metaObjectBuilder.setMetaObjectTo(objectHolder: self)
+    }
+
     /// Creates a holder for a specified owner.
     ///
     /// This initializer is used by the bridging code.

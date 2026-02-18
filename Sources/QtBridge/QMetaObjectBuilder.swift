@@ -13,7 +13,14 @@ import QtBridgeCpp
 /// implementation automatically.
 public class QMetaObjectBuilder
 {
+    private let className: String
+    private let moduleName: String
+
     private var builder: SwiftMetaObjectBuilder
+
+    private lazy var qmlElementBuilder: SwiftQmlElementBuilder = {
+        return SwiftQmlElementBuilder(moduleName, className)
+    }()
 
     struct PropertyData {
         public let name: String
@@ -34,9 +41,18 @@ public class QMetaObjectBuilder
     private var properties: [PropertyData] = []
     private var methods: [(Any, QMetaParamsList) -> QVariant] = []
     private var bridgeRoot: ((UnsafeMutableRawPointer) -> Any?)?
+    private var initFn: (() -> Any)?
+    private var createFn: ((UnsafeMutableRawPointer) -> Void)?
 
     private init(type: QObjectBuildable.Type) {
-        self.builder = SwiftMetaObjectBuilder(String(describing: type))
+        self.className = String(describing: type)
+        let fullName = String(reflecting: type)
+        self.moduleName = fullName
+            .split(separator: ".")
+            .dropLast()
+            .joined(separator: ".")
+
+        self.builder = SwiftMetaObjectBuilder(className)
     }
 
     /// Creates a Meta-Object Builder from a type conforming to
@@ -53,6 +69,12 @@ public class QMetaObjectBuilder
         type.registerMethodsAndProperties(for: builder)
         builder.endMetaRegistration()
         return builder
+    }
+
+    internal func registerQmlElement(from type: QmlInstantiable.Type) {
+        type.registerMetaTypeInterface(for: self)
+        qmlElementBuilder.setMetaObjectFrom(self.builder)
+        qmlElementBuilder.registerQmlElement()
     }
 
     internal func setMetaObjectTo(objectHolder: QObjectHolder) {
@@ -295,6 +317,45 @@ public class QMetaObjectBuilder
             return mySelf.invoke(
                 methodIndex: Int(methodId), rootPtr: objPtr,
                 args: QMetaParamsList(args: params)).cppVariant()
+        })
+    }
+
+    internal func registerInitializer(initFn: @escaping () -> Any) {
+        self.initFn = initFn
+    }
+
+    public func registerCreateFn<Root: QObjectBuildable>(objectHolderPath: WritableKeyPath<Root, QObjectHolder?>) -> Void {
+        guard let initFn = self.initFn else {
+            return
+        }
+
+        createFn = { addr in
+            guard var root = initFn() as? Root else {
+                return
+            }
+            root[keyPath: objectHolderPath] = QtBridge.QObjectHolder(
+                owner: root,
+                ptr: addr,
+                deleter: { ptr in
+                    guard let ptr else {
+                        return
+                    }
+                    Unmanaged<AnyObject>.fromOpaque(ptr).release()
+                }
+            )
+            _ = Unmanaged.passRetained(root).toOpaque()
+        }
+
+        self.qmlElementBuilder.registerCreateFn(QMetaObjectBuilder.bridge(self),
+        { (selfPtr: UnsafeMutableRawPointer?, addr: UnsafeMutableRawPointer?) in
+            guard let addr else {
+                return
+            }
+            let mySelf = QMetaObjectBuilder.bridge(selfPtr!)!
+            guard let createFn = mySelf.createFn else {
+                return
+            }
+            return createFn(addr)
         })
     }
 

@@ -73,6 +73,8 @@ final class QListModelTests: XCTestCase {
                     }
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "TestModel"))
@@ -119,6 +121,8 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\TestModel.arrayTwoModel
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "TestModel"))
             }
             """,
             macros: macros,
@@ -173,6 +177,8 @@ final class QListModelTests: XCTestCase {
                     self.date = date
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "Message"))
@@ -194,6 +200,8 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\Message.date
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "Message"))
             }
             public class ChatModel {
 
@@ -202,6 +210,8 @@ final class QListModelTests: XCTestCase {
                         self.emitSignal(for: "msgs")
                     }
                 }
+
+                \(QtBridgableOutputs.privateHolderVar)
 
                 \(QtBridgableOutputs.holderVar)
 
@@ -214,6 +224,8 @@ final class QListModelTests: XCTestCase {
                     keyPath: \\ChatModel.msgs
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "ChatModel"))
             }
             """,
             macros: macros,
@@ -269,6 +281,8 @@ final class QListModelTests: XCTestCase {
                     self.date = date
                 }
 
+                \(QtBridgableOutputs.privateHolderVar)
+
                 \(QtBridgableOutputs.holderVar)
 
                 \(QtBridgableOutputs.builderVar(className: "Message"))
@@ -290,9 +304,13 @@ final class QListModelTests: XCTestCase {
                         keyPath: \\Message.date
                     )
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "Message"))
             }
             public class ChatModel {
                 public var msgs: QListModel<Message> = []
+
+                \(QtBridgableOutputs.privateHolderVar)
 
                 \(QtBridgableOutputs.holderVar)
 
@@ -302,6 +320,8 @@ final class QListModelTests: XCTestCase {
                     builder.startRegistration(for: self)
 
                 }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "ChatModel"))
             }
             """,
             macros: macros,
