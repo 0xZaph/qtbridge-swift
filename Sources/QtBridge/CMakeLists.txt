@@ -37,6 +37,16 @@ target_compile_options(QtBridge PUBLIC
     "$<$<COMPILE_LANGUAGE:Swift>:${package_name}>"
 )
 
+if(WIN32)
+    target_compile_options(QtBridge PUBLIC
+        "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>"
+        "$<$<COMPILE_LANGUAGE:Swift>:-std=c++20>"
+    )
+    target_compile_options(QtBridge PRIVATE
+        "$<$<COMPILE_LANGUAGE:Swift>:-DQT_IS_CXX_20>"
+    )
+endif()
+
 if(DEFINED QTBRIDGE_SWIFT_BRIDGING_INCLUDE)
     target_compile_options(QtBridge PUBLIC
         "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>"

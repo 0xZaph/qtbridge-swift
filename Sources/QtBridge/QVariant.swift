@@ -34,7 +34,13 @@ public struct QVariant
     public init(value: [String]) {
         var list: QStringList = QStringList()
         value.forEach { str in
+#if QT_IS_CXX_20
+            // QString.init(_:) becomes ambiguous with C++20
+            let stdStr = std.string(str)
+            list.append(QString.fromStdString(stdStr))
+#else
             list.append(QString(str))
+#endif
         }
         self.variant = QtBridgeCpp.QVariant(list)
     }
