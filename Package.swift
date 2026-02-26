@@ -13,7 +13,9 @@ let dependencies: [Package.Dependency] = [
     .package(url: "https://github.com/apple/swift-syntax.git", from: swiftSyntaxVersion),
 
     useLocal ? .package(path: "../Qt")
-    : .package(url: "https://git.qt.io/qtbridge/qtforswift.git", branch: "master")
+    : .package(url: "https://git.qt.io/qtbridge/qtforswift.git", branch: "master"),
+
+    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
 ]
 
 let qtPackageName: String = useLocal ? "Qt" : "qtforswift"
