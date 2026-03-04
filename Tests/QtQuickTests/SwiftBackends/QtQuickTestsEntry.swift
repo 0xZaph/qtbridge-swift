@@ -17,6 +17,7 @@ final class QtBridgeQuickTest: XCTestCase {
         testModule.singletons["SimpleQListModel"] = SimpleQListModel()
         testModule.singletons["SignalsModel"] = SignalsModel()
         testModule.singletons["SlotsModel"] = SlotsModel()
+        testModule.singletons["TableModel"] = TableModel()
 
         QmlType1.registerQmlElement()
         QmlType2.registerQmlElement()

@@ -41,8 +41,8 @@ public:
     using ParentFunc = QModelIndex(*)(void*, const QModelIndex*);
     void registerParent(ParentFunc parentCallback);
 
-    void registerRowCount(CallbackBase::CountFunc rowCountCallback);
-    void registerColumnCount(CallbackBase::CountFunc columnCountCallback);
+    void registerRowCount(CallbackBase::RowCountFunc rowCountCallback);
+    void registerColumnCount(CallbackBase::RowCountFunc columnCountCallback);
 
     void registerData(CallbackBase::DataFunc dataCallback);
     void registerSetData(CallbackBase::SetDataFunc setDataCallback);

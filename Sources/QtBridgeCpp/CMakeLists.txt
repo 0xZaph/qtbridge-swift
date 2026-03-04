@@ -4,6 +4,7 @@
 set(QTBRIDGE_CPP_SOURCES
     abstractitemmodel.cpp
     abstractlistmodel.cpp
+    abstracttablemodel.cpp
     callbackbase.cpp
     metaparamslist.cpp
     qappcpp.cpp

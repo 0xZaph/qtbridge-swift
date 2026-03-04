@@ -4,6 +4,7 @@
 set(QTBRIDGE_SWIFT_SOURCES
     QAbstractItemModel.swift
     QAbstractListModel.swift
+    QAbstractTableModel.swift
     QApp.swift
     QListModel.swift
     QMetaObjectBuilder.swift
@@ -14,8 +15,9 @@ set(QTBRIDGE_SWIFT_SOURCES
     QNamespace.swift
     QObjectBuildable.swift
     QObjectHolder.swift
-    QVariant.swift
+    QTableModel.swift
     QtBridgesMacros.swift
+    QVariant.swift
 )
 
 add_library(QtBridge

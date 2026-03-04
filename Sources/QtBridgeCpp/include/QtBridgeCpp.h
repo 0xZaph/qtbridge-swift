@@ -5,6 +5,7 @@
 
 #include "abstractitemmodel.h"
 #include "abstractlistmodel.h"
+#include "abstracttablemodel.h"
 #include "callbackbase.h"
 #include "metaparamslist.h"
 #include "qappcpp.h"

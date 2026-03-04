@@ -121,7 +121,7 @@ QVariant QAbstractListModelCpp::toVariant() const
     return QVariant::fromValue(m_impl.get());
 }
 
-void QAbstractListModelCpp::registerRowCount(CallbackBase::CountFunc rowCountCallback)
+void QAbstractListModelCpp::registerRowCount(CallbackBase::RowCountFunc rowCountCallback)
 {
     s_rowCountFunc = rowCountCallback;
 }
@@ -145,13 +145,13 @@ void QAbstractListModelCpp::beginInsertRows(const QModelIndex parent, int first,
     m_impl->beginInsertRows(parent, first, last);
 }
 
-void QAbstractListModelCpp::endInsertRows() { return m_impl->endInsertRows(); }
+void QAbstractListModelCpp::endInsertRows() { m_impl->endInsertRows(); }
 
 void QAbstractListModelCpp::beginRemoveRows(const QModelIndex &parent, int first, int last) {
     m_impl->beginRemoveRows(parent, first, last);
 }
 
-void QAbstractListModelCpp::endRemoveRows() { return m_impl->endRemoveRows(); }
+void QAbstractListModelCpp::endRemoveRows() { m_impl->endRemoveRows(); }
 
 void QAbstractListModelCpp::beginResetModel() { m_impl->beginResetModel(); }
 

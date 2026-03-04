@@ -136,6 +136,11 @@ public struct QtBridgeableMacro {
         return t.hasPrefix("QListModel<") && t.hasSuffix(">")
     }
 
+    static func isQTableModelType(type: String) -> Bool {
+        let t = type.replacingOccurrences(of: " ", with: "")
+        return t.hasPrefix("QTableModel<") && t.hasSuffix(">")
+    }
+
     private static func buildArgTypes(params: FunctionParameterListSyntax,
                                       arrayName: String) -> (arrayInit: String, pushCalls: [String])?
     {
@@ -293,6 +298,7 @@ public struct QtBridgeableMacro {
         if let propertyType = variableDecl.type {
             isSupportedType = isSupportedBasicType(type: propertyType)
                               || isQListModelType(type: propertyType)
+                                || isQTableModelType(type: propertyType)
         }
 
         guard isSupportedType
@@ -445,7 +451,9 @@ extension QtBridgeableMacro: MemberAttributeMacro {
         }
 
         guard isSupportedBasicType(type: property.type!) ||
-              isQListModelType(type: property.type!) else { return [] }
+                isQListModelType(type: property.type!) ||
+                isQTableModelType(type: property.type!)
+        else { return [] }
 
         return [
             AttributeSyntax(

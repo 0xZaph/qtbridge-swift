@@ -21,7 +21,7 @@ public:
             return parentCallback(m_swiftModel, &child);
         };
     }
-    void registerColumnCount(CountFunc columnCountCallback) {
+    void registerColumnCount(ColumnCountFunc columnCountCallback) {
         m_props.m_columnCount = [=](const QModelIndex &index) {
             return columnCountCallback(m_swiftModel, &index);
         };
@@ -267,12 +267,12 @@ void QAbstractItemModelCpp::registerParent(ParentFunc parentCallback)
     m_impl->registerParent(parentCallback);
 }
 
-void QAbstractItemModelCpp::registerRowCount(CallbackBase::CountFunc rowCountCallback)
+void QAbstractItemModelCpp::registerRowCount(CallbackBase::RowCountFunc rowCountCallback)
 {
     m_impl->registerRowCount(rowCountCallback);
 }
 
-void QAbstractItemModelCpp::registerColumnCount(CallbackBase::CountFunc columnCountCallback)
+void QAbstractItemModelCpp::registerColumnCount(CallbackBase::ColumnCountFunc columnCountCallback)
 {
     m_impl->registerColumnCount(columnCountCallback);
 }

@@ -33,7 +33,7 @@ public:
     QAbstractListModel* getModel() const;
     QVariant toVariant() const;
 
-    static void registerRowCount(CallbackBase::CountFunc rowCountCallback);
+    static void registerRowCount(CallbackBase::RowCountFunc rowCountCallback);
     static void registerData(CallbackBase::DataFunc dataCallback);
     static void registerSetData(CallbackBase::SetDataFunc setDataCallback);
     static void registerRoleNames(CallbackBase::RoleNamesFunc roleNamesCallback);
@@ -54,7 +54,7 @@ private:
     class QAbstractListModelImpl;
     std::unique_ptr<QAbstractListModelImpl> m_impl;
 
-    inline static CallbackBase::CountFunc s_rowCountFunc = nullptr;
+    inline static CallbackBase::RowCountFunc s_rowCountFunc = nullptr;
     inline static CallbackBase::DataFunc s_dataFunc = nullptr;
     inline static CallbackBase::SetDataFunc s_setDataFunc = nullptr;
     inline static CallbackBase::RoleNamesFunc s_roleNamesFunc = nullptr;

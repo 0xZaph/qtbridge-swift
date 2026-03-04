@@ -769,4 +769,137 @@ final class QtBridgeableExpansionTest: XCTestCase {
             indentationWidth: .spaces(4)
         )
     }
+    func testQTableModelIsTracked() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class MyModel {
+                public var table: QTableModel<Person>
+
+                public var people = [
+                    Person(givenName: "Harry", number: 1, lastName: "Potter"),
+                    Person(givenName: "Hermione", number: 2, lastName: "Granger"),
+                    Person(givenName: "Ron", number: 3, lastName: "Weasley")
+                ]
+
+                public init() {
+                    self.table = QTableModel(people) {
+                        [
+                            QTableColumn("Name:", value: \\.givenName),
+                            QTableColumn("Last Name:", value: \\.lastName),
+                            QTableColumn("Number: ", value: \\.number)
+                        ]
+                    }
+                }
+            }
+            """,
+            expandedSource:
+            """
+            public class MyModel {
+                public var table: QTableModel<Person> {
+                    didSet {
+                        self.emitSignal(for: "table")
+                    }
+                }
+
+                public var people = [
+                    Person(givenName: "Harry", number: 1, lastName: "Potter"),
+                    Person(givenName: "Hermione", number: 2, lastName: "Granger"),
+                    Person(givenName: "Ron", number: 3, lastName: "Weasley")
+                ]
+
+                public init() {
+                    self.table = QTableModel(people) {
+                        [
+                            QTableColumn("Name:", value: \\.givenName),
+                            QTableColumn("Last Name:", value: \\.lastName),
+                            QTableColumn("Number: ", value: \\.number)
+                        ]
+                    }
+                }
+
+                \(QtBridgableOutputs.privateHolderVar)
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "MyModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+                    builder.registerProperty(
+                    name: "table",
+                    keyPath: \\MyModel.table
+                    )
+                }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "MyModel"))
+            }
+            """,
+            macros: macros
+        )
+    }
+
+    func testQTableModelIsIgnored() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class MyModel {
+                @QtIgnored
+                public var table: QTableModel<Person>
+
+                public var people = [
+                    Person(givenName: "Harry", number: 1, lastName: "Potter"),
+                    Person(givenName: "Hermione", number: 2, lastName: "Granger"),
+                    Person(givenName: "Ron", number: 3, lastName: "Weasley")
+                ]
+
+                public init() {
+                    self.table = QTableModel(people) {
+                        [
+                            QTableColumn("Name:", value: \\.givenName),
+                            QTableColumn("Last Name:", value: \\.lastName),
+                            QTableColumn("Number: ", value: \\.number)
+                        ]
+                    }
+                }
+            }
+            """,
+            expandedSource:
+            """
+            public class MyModel {
+                public var table: QTableModel<Person>
+
+                public var people = [
+                    Person(givenName: "Harry", number: 1, lastName: "Potter"),
+                    Person(givenName: "Hermione", number: 2, lastName: "Granger"),
+                    Person(givenName: "Ron", number: 3, lastName: "Weasley")
+                ]
+
+                public init() {
+                    self.table = QTableModel(people) {
+                        [
+                            QTableColumn("Name:", value: \\.givenName),
+                            QTableColumn("Last Name:", value: \\.lastName),
+                            QTableColumn("Number: ", value: \\.number)
+                        ]
+                    }
+                }
+
+                \(QtBridgableOutputs.privateHolderVar)
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "MyModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+
+                }
+
+                \(QtBridgableOutputs.registerMetaTypeInterface(className: "MyModel"))
+            }
+            """,
+            macros: macros
+        )
+    }
 }

@@ -5,9 +5,14 @@
 
 CallbackBase::CallbackBase(void* swift) : m_swiftModel(swift) {}
 
-void CallbackBase::registerRowCount(CountFunc rowCountCallback) {
+void CallbackBase::registerRowCount(RowCountFunc rowCountCallback) {
     m_basicProps.m_rowCount = [=](const QModelIndex &index) {
         return rowCountCallback(m_swiftModel, &index);
+    };
+}
+void CallbackBase::registerColumnCount(ColumnCountFunc columnCountCallback) {
+    m_basicProps.m_columnCount = [=](const QModelIndex &index) {
+        return columnCountCallback(m_swiftModel, &index);
     };
 }
 void CallbackBase::registerData(DataFunc dataCallback) {
@@ -23,6 +28,11 @@ void CallbackBase::registerSetData(SetDataFunc setDataCallback) {
 void CallbackBase::registerRoleNames(RoleNamesFunc roleNamesCallback) {
     m_basicProps.m_roleNames = [=]() {
         return roleNamesCallback(m_swiftModel);
+    };
+}
+void CallbackBase::registerHeaderData(HeaderDataFunc headerDataCallback) {
+    m_basicProps.m_headerData = [=](int section, Qt::Orientation orientation, int role) {
+        return headerDataCallback(m_swiftModel, section, orientation, role);
     };
 }
 void CallbackBase::registerInsertRows(InsertFunc insertRowsCallback) {

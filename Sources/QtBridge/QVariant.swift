@@ -89,6 +89,9 @@ public struct QVariant
     internal init(model: QAbstractListModel) {
         self.variant = model.getCppModel().toVariant()
     }
+    internal init(model: QAbstractTableModel) {
+        self.variant = model.getCppModel().toVariant()
+    }
 
     internal func value<T: QVariantSettable>() -> T {
         return T.value(from: self)
