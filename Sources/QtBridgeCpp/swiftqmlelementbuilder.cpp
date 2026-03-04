@@ -4,6 +4,8 @@
 #include "swiftqmlelementbuilder.h"
 
 #include <QtCore/qmetaobject.h>
+
+#include <QtQml/qqml.h>
 #include <QtQml/qqmlprivate.h>
 
 #include "qobjectproxy.h"
@@ -47,16 +49,16 @@ public:
         rt.version = QTypeRevision::fromVersion(1, 0);
         rt.elementName = m_className.data();
         rt.metaObject = m_metaObject;
-        rt.attachedPropertiesFunction = nullptr;
-        rt.attachedPropertiesMetaObject = nullptr;
-        rt.parserStatusCast = -1;
-        rt.valueSourceCast = -1;
-        rt.valueInterceptorCast = -1;
+        rt.attachedPropertiesFunction = qmlAttachedPropertiesFunction(nullptr, m_metaObject),
+        rt.attachedPropertiesMetaObject = m_metaObject;
+        rt.parserStatusCast = QQmlPrivate::StaticCastSelector<QObjectProxyImpl, QQmlParserStatus>::cast();
+        rt.valueSourceCast =  QQmlPrivate::StaticCastSelector<QObjectProxyImpl, QQmlPropertyValueSource>::cast();
+        rt.valueInterceptorCast = QQmlPrivate::StaticCastSelector<QObjectProxyImpl, QQmlPropertyValueInterceptor>::cast();
         rt.extensionObjectCreate = nullptr;
         rt.extensionMetaObject = nullptr;
         rt.customParser = nullptr;
         rt.revision = QTypeRevision::fromVersion(0, 0);
-        rt.finalizerCast = -1;
+        rt.finalizerCast = QQmlPrivate::StaticCastSelector<QObjectProxyImpl, QQmlFinalizerHook>::cast();
         rt.creationMethod = QQmlPrivate::ValueTypeCreationMethod::None;
         QQmlPrivate::qmlregister(QQmlPrivate::TypeRegistration, &rt);
     }

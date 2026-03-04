@@ -32,6 +32,13 @@ public:
 
     QObject * object() { return m_object; }
 
+    void registerComponentComplete(void *holderPtr, CompleteFn callback)
+    {
+        QObjectProxyImpl *obj = qobject_cast<QObjectProxyImpl *>(m_object);
+        if (obj)
+            obj->registerComponentComplete(holderPtr, callback);
+    }
+
 private:
     enum Ownership {
         Cpp,
@@ -66,4 +73,9 @@ QObject * QObjectProxy::toObject() const
 QVariant QObjectProxy::toVariant() const
 {
     return QVariant::fromValue(m_impl->object());
+}
+
+void QObjectProxy::registerComponentComplete(void *holderPtr, CompleteFn callback)
+{
+    m_impl->registerComponentComplete(holderPtr, callback);
 }

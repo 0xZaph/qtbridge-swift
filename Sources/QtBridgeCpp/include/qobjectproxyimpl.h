@@ -5,15 +5,18 @@
 
 #include <QtCore/qobject.h>
 #include <QtQml/qqmllist.h>
+#include <QtQml/qqmlparserstatus.h>
 
 #include "swiftobjectaccesor.h"
 
 class QObjectProxyImpl : public QObject,
-                         public SwiftObjectAccesor
+                         public SwiftObjectAccesor,
+                         public QQmlParserStatus
 {
     Q_OBJECT
     Q_CLASSINFO("DefaultProperty", "children")
     Q_PROPERTY(QQmlListProperty<QObject> children READ children CONSTANT)
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     QObjectProxyImpl(void *swiftObj)
@@ -32,9 +35,17 @@ public:
 
     QQmlListProperty<QObject> children();
 
+    using CompleteFn = void(*)(void *);
+    void registerComponentComplete(void *holderPtr, CompleteFn callback);
+
+    void classBegin() override;
+    void componentComplete() override;
+
 private:
     QList<QObject *> m_children;
 
     void* m_swiftObj = nullptr;
     DeleterFn m_deleter = nullptr;
+
+    std::function<void()> m_completeCallback = nullptr;
 };

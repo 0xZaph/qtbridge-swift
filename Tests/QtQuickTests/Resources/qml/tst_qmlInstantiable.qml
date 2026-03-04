@@ -58,6 +58,21 @@ TestCase {
         QmlType2 {}
     }
 
+    // componentComplete()
+    QmlType3 {
+        id: qmlComponent
+
+        prop1: 21
+        prop2: 42
+        prop3: 63
+    }
+
+    SignalSpy {
+        id: sumChangedSpy
+        target: qmlComponent
+        signalName: "sumChanged"
+    }
+
     function test_initialSetup() {
         compare(qmlType1.strProp, "testString")
         compare(qmlType2.intProp, 0)
@@ -141,5 +156,16 @@ TestCase {
 
         instance1.destroy()
         instance2.destroy()
+    }
+
+    function test_componentComplete() {
+        // qmlComponent is now complete, check if the callback was called
+        // after the properties were initialized
+
+        let expectedSum = qmlComponent.prop1
+                        + qmlComponent.prop2
+                        + qmlComponent.prop3
+        compare(qmlComponent.sum, expectedSum)
+        compare(sumChangedSpy.count, 1)
     }
 }

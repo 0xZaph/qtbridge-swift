@@ -19,6 +19,19 @@ public class QObjectHolder {
         self.owner = owner
         self.proxy = QObjectProxy(QObjectHolder.bridge(owner), ptr, deleter)
         type(of: owner).metaObjectBuilder.setMetaObjectTo(objectHolder: self)
+
+        if owner is QmlInstantiableStatus {
+            self.proxy.registerComponentComplete(
+                QObjectHolder.bridge(self),
+                { (selfPtr: UnsafeMutableRawPointer?) in
+                    guard let selfPtr,
+                          let mySelf = QObjectHolder.bridge(selfPtr)
+                    else { return }
+
+                    mySelf.invokeComponentComplete()
+                }
+            )
+        }
     }
 
     /// Creates a holder for a specified owner.
@@ -41,7 +54,21 @@ public class QObjectHolder {
         return type(of: owner).metaObjectBuilder.setProperty(propIndex: propIndex, root: owner, value: value)
     }
 
+    private func invokeComponentComplete() {
+        guard let owner = self.owner else {
+            return
+        }
+
+        if let component = owner as? QmlInstantiableStatus {
+            component.componentComplete()
+        }
+    }
+
     private static func bridge<T: AnyObject>(_ obj: T) -> UnsafeMutableRawPointer {
         UnsafeMutableRawPointer(Unmanaged.passUnretained(obj).toOpaque())
+    }
+
+    private static func bridge(_ ptr: UnsafeMutableRawPointer) -> QObjectHolder? {
+        return Unmanaged<QObjectHolder>.fromOpaque(ptr).takeUnretainedValue()
     }
 }

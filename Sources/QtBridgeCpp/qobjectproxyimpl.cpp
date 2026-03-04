@@ -19,6 +19,23 @@ QQmlListProperty<QObject> QObjectProxyImpl::children()
     return QQmlListProperty<QObject>(this, &m_children);
 }
 
+void QObjectProxyImpl::registerComponentComplete(void *holderPtr, CompleteFn callback)
+{
+    m_completeCallback = [holderPtr, callback]() {
+        callback(holderPtr);
+    };
+}
+
+void QObjectProxyImpl::classBegin()
+{
+}
+
+void QObjectProxyImpl::componentComplete()
+{
+   if (m_completeCallback)
+        m_completeCallback();
+}
+
 /****************************************************************************
 ** Meta object code from reading C++ file 'qobjectproxyimpl.h'
 **
@@ -113,6 +130,10 @@ void *QObjectProxyImpl::qt_metacast(const char *_clname)
         return static_cast<void*>(this);
     if (!strcmp(_clname, "SwiftObjectAccesor"))
         return static_cast< SwiftObjectAccesor*>(this);
+    if (!strcmp(_clname, "QQmlParserStatus"))
+        return static_cast< QQmlParserStatus*>(this);
+    if (!strcmp(_clname, "org.qt-project.Qt.QQmlParserStatus"))
+        return static_cast< QQmlParserStatus*>(this);
     return QObject::qt_metacast(_clname);
 }
 

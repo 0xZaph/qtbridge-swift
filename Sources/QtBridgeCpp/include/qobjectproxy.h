@@ -20,6 +20,9 @@ public:
     QObject *toObject() const;
     QVariant toVariant() const;
 
+    using CompleteFn = void(*)(void *);
+    void registerComponentComplete(void *holderPtr, CompleteFn callback);
+
 private:
     class Impl;
     std::shared_ptr<Impl> m_impl;
