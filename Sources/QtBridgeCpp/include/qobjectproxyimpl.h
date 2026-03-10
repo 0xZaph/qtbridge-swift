@@ -34,6 +34,7 @@ public:
     void* swiftObject() const final;
 
     QQmlListProperty<QObject> children();
+    QList<void*> swiftChildren() const;
 
     using CompleteFn = void(*)(void *);
     void registerComponentComplete(void *holderPtr, CompleteFn callback);

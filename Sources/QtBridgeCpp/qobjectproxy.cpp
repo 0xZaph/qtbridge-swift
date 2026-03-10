@@ -32,6 +32,15 @@ public:
 
     QObject * object() { return m_object; }
 
+    QList<void *> swiftChildren() const
+    {
+        QObjectProxyImpl *obj = qobject_cast<QObjectProxyImpl *>(m_object);
+        if (!obj)
+            return {};
+
+        return obj->swiftChildren();
+    }
+
     void registerComponentComplete(void *holderPtr, CompleteFn callback)
     {
         QObjectProxyImpl *obj = qobject_cast<QObjectProxyImpl *>(m_object);
@@ -73,6 +82,11 @@ QObject * QObjectProxy::toObject() const
 QVariant QObjectProxy::toVariant() const
 {
     return QVariant::fromValue(m_impl->object());
+}
+
+QList<void *> QObjectProxy::swiftChildren() const
+{
+    return m_impl->swiftChildren();
 }
 
 void QObjectProxy::registerComponentComplete(void *holderPtr, CompleteFn callback)

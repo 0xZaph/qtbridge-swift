@@ -46,6 +46,7 @@ public func runQtQuickTests() -> Int32 {
     QmlType1.registerQmlElement()
     QmlType2.registerQmlElement()
     QmlType3.registerQmlElement()
+    QmlType4.registerQmlElement()
 
     let qmlDir = Bundle.module.url(forResource: "qml", withExtension: nil)!
     qTestApp.setInputDir(qmlDir.path)

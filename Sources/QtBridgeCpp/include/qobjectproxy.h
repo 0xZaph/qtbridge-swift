@@ -20,6 +20,8 @@ public:
     QObject *toObject() const;
     QVariant toVariant() const;
 
+    QList<void *> swiftChildren() const;
+
     using CompleteFn = void(*)(void *);
     void registerComponentComplete(void *holderPtr, CompleteFn callback);
 

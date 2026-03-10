@@ -6,6 +6,12 @@ public protocol QmlInstantiable: QObjectBuildable {
 }
 
 extension QmlInstantiable {
+    public var qmlChildren: [QObjectBuildable] {
+        return objectHolder.qmlChildren
+    }
+}
+
+extension QmlInstantiable {
     package static func registerQmlElement() {
         metaObjectBuilder.registerInitializer(initFn: self.init)
         metaObjectBuilder.registerQmlElement(from: Self.self)

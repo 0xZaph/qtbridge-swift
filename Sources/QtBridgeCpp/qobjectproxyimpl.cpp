@@ -19,6 +19,26 @@ QQmlListProperty<QObject> QObjectProxyImpl::children()
     return QQmlListProperty<QObject>(this, &m_children);
 }
 
+QList<void*> QObjectProxyImpl::swiftChildren() const
+{
+    QList<void*> children;
+    children.reserve(m_children.size());
+
+    for (auto *child : m_children) {
+        QObjectProxyImpl *proxy = qobject_cast<QObjectProxyImpl *>(child);
+        if (!proxy)
+            continue;
+
+        void* ptr = proxy->swiftObject();
+        if (!ptr)
+            continue;
+
+        children << ptr;
+    }
+
+    return children;
+}
+
 void QObjectProxyImpl::registerComponentComplete(void *holderPtr, CompleteFn callback)
 {
     m_completeCallback = [holderPtr, callback]() {

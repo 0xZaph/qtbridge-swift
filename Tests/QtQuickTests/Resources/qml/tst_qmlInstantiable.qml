@@ -47,6 +47,29 @@ TestCase {
         QmlType2 { id: nested2 }
     }
 
+    // qmlChildren
+    QmlType4 {
+        id: containing2
+
+        QmlType1 {
+            strId: "child1"
+        }
+        QmlType2 {
+            strId: "child2"
+            intProp: 11
+        }
+        QmlType2 {
+            strId: "child3"
+            intProp: 22
+        }
+        Rectangle {}
+        QmlType2 {
+            id: containing2nested
+            strId: "containing2nested"
+            intProp: 33
+        }
+    }
+
     // dynamic instantiations
     Component {
         id: qmlType1Component
@@ -135,6 +158,39 @@ TestCase {
         nested2.intProp = expectedInt
         compare(nested1.strProp, expectedStr)
         compare(nested2.intProp, expectedInt)
+    }
+
+    function test_qmlChildren() {
+        compare(containing2.children.length, 5)
+
+        // qmlChildren contains only Swift objects
+        compare(containing2.qmlChildrenCount, 4)
+
+        // QmlType1 children
+        compare(containing2.type1ChildrenCount, 1)
+        // QmlType2 children
+        compare(containing2.type2ChildrenCount, 3)
+        // QmlType3 children
+        compare(containing2.type3ChildrenCount, 0)
+
+        // Sum of QmlType2 children properties
+        containing2.updateIntPropSum()
+        compare(containing2.intPropSum, 11 + 22 + 33)
+
+        let newValue = 44
+        containing2nested.intProp = newValue
+        containing2.updateIntPropSum()
+        compare(containing2.intPropSum, 11 + 22 + newValue)
+
+        // Ensure correct order of children objects
+        var ids = []
+        for (var i = 0; i < containing2.children.length; i++) {
+            var child = containing2.children[i]
+            if (child.strId !== undefined)
+                ids.push(child.strId)
+        }
+        containing2.updateChildrenIds()
+        compare(containing2.childrenIds, ids)
     }
 
     function test_dynamicInstantiation() {

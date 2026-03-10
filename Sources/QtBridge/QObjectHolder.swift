@@ -44,6 +44,26 @@ public class QObjectHolder {
         type(of: owner).metaObjectBuilder.setMetaObjectTo(objectHolder: self)
     }
 
+    internal var qmlChildren: [QObjectBuildable] {
+        var result: [QObjectBuildable] = []
+
+        let childrenPtrs = proxy.swiftChildren()
+        for i in 0..<childrenPtrs.size() {
+            let ptr = childrenPtrs[i]
+            guard let ptr else { continue }
+
+            let object = Unmanaged<AnyObject>
+                .fromOpaque(ptr)
+                .takeUnretainedValue()
+
+            if let buildable = object as? QObjectBuildable {
+                result.append(buildable)
+            }
+        }
+
+        return result
+    }
+
     internal func getProperty(propIndex: Int) -> QVariant {
         guard let owner = owner else { return QVariant() }
         return type(of: owner).metaObjectBuilder.getProperty(propIndex: propIndex, root: owner)
