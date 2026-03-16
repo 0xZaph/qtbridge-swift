@@ -8,10 +8,9 @@ import QtBridgeCpp
 // resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
 // For CMake builds, the equivalent resources come from the system Qt installation.
 import QmlImports
-
 #endif
 
-public class QMLApp {
+internal class QMLApp {
     var qmlApp: QAppCpp
 
     public init() {
@@ -39,16 +38,73 @@ public class QMLApp {
     }
 }
 
+/// The entry point for a Qt Bridge application.
+///
+/// Conform to the `QApp` protocol to define your application's
+/// configuration. A type that adopts `QApp` specifies the
+/// QML file to load when the application starts and the Swift
+/// objects that should be exposed to QML. Only Swift types
+/// annotated with the ``QtBridgeable()`` macro are supported.
+///
+/// Declare a structure that conforms to `QApp` and mark it with
+/// the `@main` attribute:
+///
+/// ```swift
+/// @main
+/// struct MyApp: QApp {
+///     let qmlFileName: String = "main"
+///     var initialProperties: [String: QObjectBuildable] {
+///         [
+///             "myModel": MyModel()
+///         ]
+///     }
+/// }
+/// ```
+///
+/// The objects returned in ``initialProperties`` are exposed
+/// to QML and can be accessed from QML using the provided keys.
 @MainActor public protocol QApp {
+    /// Creates the application instance.
     init()
+
+    /// The name of the QML file that is loaded when the
+    /// application starts.
+    ///
+    /// Provide the file name **without the `.qml` extension**.
+    /// For example, if the file is `Main.qml`, return `"Main"`.
+    /// The bridge locates this file in the bundle specified by
+    /// ``bundle`` and loads it as the initial user interface of
+    /// the application.
     var qmlFileName: String { get }
+
+    /// The bundle that contains the QML resources.
+    ///
+    /// The default implementation returns `Bundle.main`.
+    ///
+    /// Override this property if QML files are located in a
+    /// different bundle. For example, when resources are
+    /// provided by Swift Package Manager, you may need to
+    /// return `Bundle.module`.
     var bundle: Bundle { get }
-    var initialProperties: [String : QObjectBuildable] { get }
+
+    /// Swift objects that should be exposed to QML.
+    ///
+    /// The keys of this dictionary define the names under which
+    /// the objects become available in QML. Each value must be
+    /// an object whose type is annotated with the
+    /// ``QtBridgeable()`` macro.
+    var initialProperties: [String: QObjectBuildable] { get }
 }
 
 @MainActor public extension QApp {
     var bundle: Bundle { .main }
 
+    /// Starts the application.
+    ///
+    /// This method initializes the Qt Bridge application
+    /// environment and begins the event loop. You don't call
+    /// this method directly. It is invoked automatically by the
+    /// Swift runtime for the type marked with `@main`.
     static func main() {
         let qApp = Self()
         let app = QMLApp()
