@@ -5,7 +5,7 @@ import Foundation
 import CxxStdlib
 import QtBridgeCpp
 
-public final class QAbstractListModel {
+internal final class QAbstractListModel {
     private lazy var cppModel: QAbstractListModelCpp = {
         return QAbstractListModelCpp.create(
             UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())

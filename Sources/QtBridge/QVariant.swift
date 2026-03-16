@@ -48,7 +48,7 @@ public struct QVariant
     public init(value: QObjectBuildable) {
         self.variant = value.objectHolder.proxy.toVariant()
     }
-    public init(model: QAbstractListModel) {
+    internal init(model: QAbstractListModel) {
         self.variant = model.getCppModel().toVariant()
     }
 

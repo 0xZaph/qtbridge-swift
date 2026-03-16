@@ -5,7 +5,7 @@ import Foundation
 import CxxStdlib
 import QtBridgeCpp
 
-open class QAbstractItemModel {
+internal class QAbstractItemModel {
     private var cppModel: QAbstractItemModelCpp!
 
     public init() {
