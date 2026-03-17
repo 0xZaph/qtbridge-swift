@@ -31,7 +31,7 @@ void QAppCpp::addInitialProperty(const char *name, QVariant value)
 
 void QAppCpp::setRootQml(const char *path)
 {
-    m_root = QUrl(QString::fromUtf8(path));
+    m_root = QUrl::fromLocalFile(QString::fromUtf8(path));
 }
 
 int QAppCpp::run(int argc, char **argv)
