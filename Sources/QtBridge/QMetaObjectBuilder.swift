@@ -4,6 +4,13 @@
 import Foundation
 import QtBridgeCpp
 
+/// An internal builder used to construct QMetaObject.
+///
+/// This class is responsible for registering properties, signals
+/// and slots so they can be accessed from QML.
+/// Don't use this type directly. Instead, apply the
+/// ``QtBridgeable()`` macro to a class to add the required
+/// implementation automatically.
 public class QMetaObjectBuilder
 {
     private var builder: SwiftMetaObjectBuilder
@@ -32,6 +39,15 @@ public class QMetaObjectBuilder
         self.builder = SwiftMetaObjectBuilder(String(describing: type))
     }
 
+    /// Creates a Meta-Object Builder from a type conforming to
+    /// `QObjectBuildable`.
+    ///
+    /// - Parameter type: The type used to describe the
+    /// Meta-Object.
+    /// - Returns: A `QMetaObjectBuilder` instance.
+    ///
+    /// This method is used by the bridging system. Don't call
+    /// it directly.
     static public func create(from type: QObjectBuildable.Type) -> QMetaObjectBuilder {
         let builder = QMetaObjectBuilder(type: type)
         type.registerMethodsAndProperties(for: builder)
@@ -66,6 +82,12 @@ public class QMetaObjectBuilder
         return properties.map { $0.name }
     }
 
+    /// Begins Meta-Object registration for the given root type.
+    ///
+    /// - Parameter root: The Swift type being exposed to QML.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func startRegistration<Root: QObjectBuildable>(for root: Root.Type) {
         if bridgeRoot == nil {
             bridgeRoot = { ptr in
@@ -74,10 +96,26 @@ public class QMetaObjectBuilder
         }
     }
 
+    /// Registers a signal with no arguments.
+    ///
+    /// - Parameter propertyName: The name of the property for
+    /// which change signal will be registered.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerSignal(for propertyName: String) {
         self.builder.registerSignal(QMetaObjectBuilder.signalName(for: propertyName), [])
     }
 
+    /// Registers a signal with the specified argument types.
+    ///
+    /// - Parameters:
+    ///   - signalName: The name of the signal.
+    ///   - argTypes: The types of arguments emitted with the
+    ///   signal.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerSignal(signalName: String, argTypes: [QVariantGettable.Type] = []) {
         var cppArgTypeIds = CppVectorOfInt()
         for argType in argTypes {
@@ -86,12 +124,12 @@ public class QMetaObjectBuilder
         self.builder.registerSignal(signalName, cppArgTypeIds)
     }
 
-    public func emitSignal(sender: QObjectBuildable, for propertyName: String) {
+    internal func emitSignal(sender: QObjectBuildable, for propertyName: String) {
         self.builder.emitSignal(sender.objectHolder.proxy,
                                 QMetaObjectBuilder.signalName(for: propertyName), [])
     }
 
-    public func emitSignal(sender: QObjectBuildable, signalName: String, args: [QVariant] = []) {
+    internal func emitSignal(sender: QObjectBuildable, signalName: String, args: [QVariant] = []) {
         var argsVector = CppVectorOfQVariant()
         argsVector.reserve(args.count)
         for arg in args {
@@ -100,6 +138,15 @@ public class QMetaObjectBuilder
         self.builder.emitSignal(sender.objectHolder.proxy, signalName, argsVector)
     }
 
+    /// Registers a writable property that can be accessed and
+    /// modified from QML.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the property exposed to QML.
+    ///   - keyPath: A writable keypath to the property.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerProperty<Root: QObjectBuildable, Member: QVariantSettable & Equatable>(
         name: String,
         keyPath: WritableKeyPath<Root, Member>)
@@ -157,6 +204,14 @@ public class QMetaObjectBuilder
         })
     }
 
+    /// Registers a property that can be accessed from QML.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the property exposed to QML.
+    ///   - keyPath: A writable keypath to the property.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerProperty<Root: QObjectBuildable, Member: QVariantGettable>(
         name: String,
         keyPath: WritableKeyPath<Root, Member>)
@@ -165,6 +220,14 @@ public class QMetaObjectBuilder
         registerProperty(name: name, keyPath: keyPath as KeyPath<Root, Member>)
     }
 
+    /// Registers a read-only property that can be accessed from QML.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the property exposed to QML.
+    ///   - keyPath: A writable keypath to the property.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerProperty<Root: QObjectBuildable, Member: QVariantGettable>(
         name: String,
         keyPath: KeyPath<Root, Member>)
@@ -197,6 +260,16 @@ public class QMetaObjectBuilder
         }, nil)
     }
 
+    /// Registers a slot that can be invoked from QML.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the method.
+    ///   - argTypes: The types of arguments.
+    ///   - method: The implementation to invoke when the slot
+    ///   is called.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerSlot(name: String,
                              argTypes: [QVariantGettable.Type],
                              method: @escaping (Any, QMetaParamsList) -> Void)
@@ -221,7 +294,7 @@ public class QMetaObjectBuilder
         })
     }
 
-    public func endMetaRegistration() {
+    internal func endMetaRegistration() {
         builder.endMetaRegistration()
     }
 

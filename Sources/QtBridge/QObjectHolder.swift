@@ -4,10 +4,18 @@
 import Foundation
 import QtBridgeCpp
 
+/// An internal container for underlying QObject.
+///
+/// You don't create or use this type directly. Instances are
+/// created and managed by the ``QtBridgeable()`` macro.
 public class QObjectHolder {
     package var proxy: QObjectProxy
     internal weak var owner: (QObjectBuildable)?
 
+    /// Creates a holder for a specified owner.
+    ///
+    /// This initializer is used by the bridging code.
+    /// Don’t call it directly.
     public init(owner: QObjectBuildable) {
         self.owner = owner
         self.proxy = QObjectProxy(QObjectHolder.bridge(owner))
