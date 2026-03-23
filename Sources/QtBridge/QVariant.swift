@@ -3,6 +3,15 @@
 
 import QtBridgeCpp
 
+/// A type-erased container used to bridge values between Swift
+/// and QML.
+///
+/// Swift values must be converted to `QVariant` in order to be
+/// visible to QML. The conversion is handled automatically for
+/// supported types via ``QVariantGettable`` and
+/// ``QVariantSettable``. Qt Bridge provides built-in support
+/// for common Swift types such as `Int`, `UInt`, `Bool`,
+/// `Double`, `Float`, `String`, and array of `String` elements.
 public struct QVariant
 {
     private var variant : QtBridgeCpp.QVariant
@@ -10,27 +19,52 @@ public struct QVariant
     internal init(value: QtBridgeCpp.QVariant) {
         self.variant = value
     }
+    /// Creates an invalid variant.
+    ///
+    /// Invalid variants are typically used to represent the
+    /// absence of a value.
     public init() {
         self.variant = QtBridgeCpp.QVariant()
     }
+    /// Creates a variant containing an integer value.
+    ///
+    /// - Parameter value: The integer value to store.
     public init(value: Int) {
         self.variant = QtBridgeCpp.QVariant(Int64(value))
     }
+    /// Creates a variant containing an unsigned integer value.
+    ///
+    /// - Parameter value: The unsigned integer value to store.
     public init(value: UInt) {
         self.variant = QtBridgeCpp.QVariant(UInt64(value))
     }
+    /// Creates a variant containing a Boolean value.
+    ///
+    /// - Parameter value: The Boolean value to store.
     public init(value: Bool) {
         self.variant = QtBridgeCpp.QVariant(value)
     }
+    /// Creates a variant containing a double value.
+    ///
+    /// - Parameter value: The double value to store.
     public init(value: Double) {
         self.variant = QtBridgeCpp.QVariant(value)
     }
+    /// Creates a variant containing a float value.
+    ///
+    /// - Parameter value: The float value to store.
     public init(value: Float) {
         self.variant = QtBridgeCpp.QVariant(value)
     }
+    /// Creates a variant containing a string value.
+    ///
+    /// - Parameter value: The string value to store.
     public init(value: String) {
         self.variant = QtBridgeCpp.QVariant(value)
     }
+    /// Creates a variant containing an array of strings.
+    ///
+    /// - Parameter value: The string array to store.
     public init(value: [String]) {
         var list: QStringList = QStringList()
         value.forEach { str in
@@ -45,6 +79,10 @@ public struct QVariant
         self.variant = QtBridgeCpp.QVariant(list)
     }
 
+    /// Creates a variant containing a Swift object exposed to QML.
+    ///
+    /// - Parameter value: A Swift type annotated with the
+    /// ``QtBridgeable()`` macro.
     public init(value: QObjectBuildable) {
         self.variant = value.objectHolder.proxy.toVariant()
     }
@@ -52,7 +90,7 @@ public struct QVariant
         self.variant = model.getCppModel().toVariant()
     }
 
-    public func value<T: QVariantSettable>() -> T {
+    internal func value<T: QVariantSettable>() -> T {
         return T.value(from: self)
     }
 
@@ -76,12 +114,28 @@ public struct QVariant
     }
 }
 
+/// A type that can be converted to a `QVariant`.
+///
+/// Conforming to this protocol allows a Swift type to be exposed
+/// to QML as a read-only value.
 public protocol QVariantGettable {
+    /// Converts the value to a `QVariant`.
     func toVariant() -> QVariant
+    /// Returns the
+    /// [Qt Meta-Type identifier](https://doc.qt.io/qt-6/qmetatype.html#Type-enum)
+    /// for this type.
     static func metaType() -> Int32
 }
 
+/// A type that can be converted to and from a `QVariant`.
+///
+/// This protocol extends `QVariantGettable` to support modifying
+/// data from QML.
 public protocol QVariantSettable : QVariantGettable {
+    /// Converts a `QVariant` to the value.
+    ///
+    /// - Parameter variant: The variant containing the QML value.
+    /// - Returns: A Swift value converted from the variant.
     static func value(from variant: QVariant) -> Self
 }
 

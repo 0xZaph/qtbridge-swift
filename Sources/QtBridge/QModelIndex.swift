@@ -3,18 +3,18 @@
 
 import QtBridgeCpp
 
-public class QModelIndex {
+internal class QModelIndex {
     var cppModel: QtBridgeCpp.QModelIndex
 
-    public init() { self.cppModel = QtBridgeCpp.QModelIndex() }
+    init() { self.cppModel = QtBridgeCpp.QModelIndex() }
 
     internal init(_ cppModel: QtBridgeCpp.QModelIndex) { self.cppModel = cppModel }
 
-    public func row() -> Int32 { return cppModel.row() }
+    func row() -> Int32 { return cppModel.row() }
 
-    public func column() -> Int32 { return cppModel.column() }
+    func column() -> Int32 { return cppModel.column() }
 
-    public func isValid() -> Bool { return cppModel.isValid() }
+    func isValid() -> Bool { return cppModel.isValid() }
 
-    public func internalId() -> UInt64 { return cppModel.internalId() }
+    func internalId() -> UInt64 { return cppModel.internalId() }
 }

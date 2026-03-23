@@ -92,26 +92,26 @@ internal class QAbstractItemModel {
         QAbstractItemModelCpp.destroy(cppModel)
     }
 
-    open func index(_ row: Int32, _ column: Int32, _ parent: QModelIndex = QModelIndex()) -> QModelIndex { return QModelIndex() }
+    public func index(_ row: Int32, _ column: Int32, _ parent: QModelIndex = QModelIndex()) -> QModelIndex { return QModelIndex() }
 
-    open func parent(_ child: QModelIndex) -> QModelIndex { return QModelIndex() }
+    public func parent(_ child: QModelIndex) -> QModelIndex { return QModelIndex() }
 
-    open func rowCount(_ parent: QModelIndex) -> Int32 { return 0 }
+    public func rowCount(_ parent: QModelIndex) -> Int32 { return 0 }
 
-    open func columnCount(_ parent: QModelIndex) -> Int32 { return 0 }
+    public func columnCount(_ parent: QModelIndex) -> Int32 { return 0 }
 
-    open func data(_ index: QModelIndex, _ role: Int32) -> QVariant { return QVariant() }
+    public func data(_ index: QModelIndex, _ role: Int32) -> QVariant { return QVariant() }
 
-    open func setData(_ index: QModelIndex, _ value: QVariant, _ role: Int32) -> Bool { return false }
+    public func setData(_ index: QModelIndex, _ value: QVariant, _ role: Int32) -> Bool { return false }
 
-    open func roleNames() -> [Int32: String] { return [:] }
+    public func roleNames() -> [Int32: String] { return [:] }
 
-    open func insertRows(_ row: Int32, _ count: Int32, _ index: QModelIndex) -> Bool { return false }
+    public func insertRows(_ row: Int32, _ count: Int32, _ index: QModelIndex) -> Bool { return false }
 
-    open func moveRows(_ sourceParent: QModelIndex, _ sourceRow: Int32, _ count: Int32,
+    public func moveRows(_ sourceParent: QModelIndex, _ sourceRow: Int32, _ count: Int32,
                          _ destinationParent: QModelIndex, _ destinationChild: Int32) -> Bool { return false }
 
-    open func removeRows(_ row: Int32, _ count: Int32, _ parent: QModelIndex) -> Bool { return false }
+    public func removeRows(_ row: Int32, _ count: Int32, _ parent: QModelIndex) -> Bool { return false }
 
     public func createIndex(_ row: Int32, _ column: Int32, _ id: UInt64) -> QModelIndex {
         return QModelIndex(getCppModel().createIndex(row, column, id))

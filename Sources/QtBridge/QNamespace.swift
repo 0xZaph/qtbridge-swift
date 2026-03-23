@@ -4,7 +4,7 @@
 import Foundation
 import QtBridgeCpp
 
-public struct ItemDataRole {
+internal struct ItemDataRole {
     public static let DisplayRole = Int32(QtBridgeCpp.Qt.DisplayRole.rawValue)
     public static let DecorationRole = Int32(QtBridgeCpp.Qt.DecorationRole.rawValue)
     public static let EditRole = Int32(QtBridgeCpp.Qt.EditRole.rawValue)
@@ -42,7 +42,7 @@ public struct ItemDataRole {
     public static let UserRole = Int32(QtBridgeCpp.Qt.UserRole.rawValue)
 }
 
-public struct ItemFlags {
+internal struct ItemFlags {
     public static let NoItemFlags = Int32(QtBridgeCpp.Qt.NoItemFlags.rawValue)
     public static let ItemIsSelectable = Int32(QtBridgeCpp.Qt.ItemIsSelectable.rawValue)
     public static let ItemIsEditable = Int32(QtBridgeCpp.Qt.ItemIsEditable.rawValue)
