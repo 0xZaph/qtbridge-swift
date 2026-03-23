@@ -113,6 +113,8 @@
 			<string>Organization Identifier</string>
 			<key>Description</key>
 			<string>Reverse DNS, e.g. com.example</string>
+			<key>EmptyReplacement</key>
+			<string>com.yourCompany</string>
 			<key>Type</key>
 			<string>text</string>
 			<key>Required</key>
