@@ -13,10 +13,10 @@ instructions:
         - type: Group
           instructions:
             - !include "{{qt/qtbridge-swift}}/build_cmake.yaml"
-          enable_if:
+          disable_if:
             condition: property
             property: host.os
-            equals_value: Linux
+            equals_value: MacOS
         # Use Swift build on macOS
         - type: Group
           instructions:
