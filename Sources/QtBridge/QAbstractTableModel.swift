@@ -3,6 +3,7 @@
 
 import QtBridgeCpp
 
+@MainActor
 internal final class QAbstractTableModel {
     private lazy var cppModel: QAbstractTableModelCpp = {
         return QAbstractTableModelCpp.create(
@@ -58,7 +59,7 @@ internal final class QAbstractTableModel {
         _ = self.cppModel
     }
 
-    deinit {
+    isolated deinit {
         QAbstractTableModelCpp.destroy(cppModel)
     }
 

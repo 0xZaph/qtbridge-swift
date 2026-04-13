@@ -45,7 +45,7 @@ Currently, **macOS (Apple Silicon)** and **Linux (x86_64, aarch64)** are support
 ## Requirements
 
 ### Swift
-- **Swift 6.0** or later
+- **Swift 6.2** or later
 
 ### For Swift Package Manager builds
 - **macOS 14** or later

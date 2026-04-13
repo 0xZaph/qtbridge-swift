@@ -5,6 +5,7 @@ import Foundation
 import CxxStdlib
 import QtBridgeCpp
 
+@MainActor
 internal final class QAbstractListModel {
     private lazy var cppModel: QAbstractListModelCpp = {
         return QAbstractListModelCpp.create(
@@ -56,7 +57,7 @@ internal final class QAbstractListModel {
         _ = self.cppModel
     }
 
-    deinit {
+    isolated deinit {
         QAbstractListModelCpp.destroy(cppModel)
     }
 

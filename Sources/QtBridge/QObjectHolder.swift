@@ -8,6 +8,7 @@ import QtBridgeCpp
 ///
 /// You don't create or use this type directly. Instances are
 /// created and managed by the ``QtBridgeable()`` macro.
+@MainActor
 public class QObjectHolder {
     package var proxy: QObjectProxy
     internal weak var owner: (QObjectBuildable)?

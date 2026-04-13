@@ -4,7 +4,7 @@
 import Foundation
 import QtBridge
 
-
+@MainActor
 @QtBridgeable
 public class MyModel {
     public var name: String = ""

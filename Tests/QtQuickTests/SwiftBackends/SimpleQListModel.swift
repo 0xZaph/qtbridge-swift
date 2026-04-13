@@ -4,6 +4,7 @@
 import QtBridge
 import Foundation
 
+@MainActor
 @QtBridgeable
 public class SimpleQListModel {
 

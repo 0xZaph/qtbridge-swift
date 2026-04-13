@@ -4,6 +4,7 @@
 import QtBridge
 import Foundation
 
+@MainActor
 @QtBridgeable
 public class Contact {
     var firstName: String
@@ -17,6 +18,7 @@ public class Contact {
     }
 }
 
+@MainActor
 @QtBridgeable
 public class PhoneBookModel {
 

@@ -4,6 +4,7 @@
 import Foundation
 import QtBridge
 
+@MainActor
 @QtBridgeable
 public class ListModel {
     var list: QListModel<String> = ["test string"]

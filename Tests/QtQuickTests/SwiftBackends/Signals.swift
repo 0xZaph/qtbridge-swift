@@ -4,6 +4,7 @@
 import QtBridge
 import Foundation
 
+@MainActor
 @QtBridgeable
 public final class SignalsModel {
     var sigModel: QListModel<String> = ["one", "two"]

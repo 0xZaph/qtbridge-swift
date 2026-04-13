@@ -3,6 +3,7 @@
 
 import QtBridge
 
+@MainActor
 @QtBridgeable
 public class Person {
     var givenName: String
@@ -24,6 +25,7 @@ public class Person {
     }
 }
 
+@MainActor
 @QtBridgeable
 public class TableModel {
     public var table: QTableModel<Person>

@@ -5,6 +5,7 @@ import Foundation
 import CxxStdlib
 import QtBridgeCpp
 
+@MainActor
 internal class QAbstractItemModel {
     private var cppModel: QAbstractItemModelCpp!
 
@@ -88,7 +89,7 @@ internal class QAbstractItemModel {
         }
     }
 
-    deinit {
+    isolated deinit {
         QAbstractItemModelCpp.destroy(cppModel)
     }
 

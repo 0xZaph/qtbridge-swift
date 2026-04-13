@@ -38,7 +38,7 @@ public struct QmlTestModule {
     ///
     /// Each entry is registered as a QML singleton and can be
     /// accessed from QML using the provided key.
-    public var singletons: [String : QObjectBuildable]
+    public var singletons: [String: QObjectBuildable]
 
     /// Creates a new QML test module definition.
     ///
@@ -48,7 +48,7 @@ public struct QmlTestModule {
     ///   - minor: The minor version of the module.
     ///   - singletons: Singleton objects to expose to QML.
     public init(uri: String, major: Int32, minor: Int32,
-                singletons: [String : QObjectBuildable]) {
+                singletons: [String: QObjectBuildable]) {
         self.uri = uri
         self.major = major
         self.minor = minor
@@ -92,6 +92,7 @@ public struct QtQuickTestConfiguration {
 
 /// Utility for executing Qt Quick tests using a given
 /// configuration.
+@MainActor
 public enum QtQuickTestRunner {
     /// Runs the Qt Quick test suite defined by the provided
     /// configuration.

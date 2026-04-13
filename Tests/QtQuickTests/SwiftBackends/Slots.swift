@@ -4,6 +4,7 @@
 import QtBridge
 import Foundation
 
+@MainActor
 @QtBridgeable
 public final class SlotsModel {
     public func addInts(first: Int, second: Int) -> Int {

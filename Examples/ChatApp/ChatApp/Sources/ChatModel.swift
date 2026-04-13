@@ -4,6 +4,7 @@
 import Foundation
 import QtBridge
 
+@MainActor
 @QtBridgeable
 public class Message {
     var author: String
@@ -17,6 +18,7 @@ public class Message {
     }
 }
 
+@MainActor
 @QtBridgeable
 public class ChatModel {
 

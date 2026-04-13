@@ -8,6 +8,7 @@
 /// You don't adopt this protocol directly. Instead, apply the
 /// ``QtBridgeable()`` macro to a class to add the required
 /// conformance and implementation automatically.
+@MainActor
 public protocol QObjectBuildable : AnyObject,
                                    QVariantGettable
 {
@@ -32,6 +33,7 @@ public protocol QObjectBuildable : AnyObject,
     static func registerMetaTypeInterface(for builder: QMetaObjectBuilder) -> Void
 }
 
+@MainActor
 extension QObjectBuildable {
     /// Emits a signal with the given name.
     ///
@@ -58,6 +60,7 @@ extension QObjectBuildable {
     }
 }
 
+@MainActor
 extension QObjectBuildable {
     internal func addInitialProperty(to app: QMLApp, name: String) {
         app.addInitialProperty(name: name, value: self.toVariant())

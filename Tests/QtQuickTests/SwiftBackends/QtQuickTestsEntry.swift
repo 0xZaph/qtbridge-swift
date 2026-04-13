@@ -6,8 +6,9 @@ import QmlImports
 import QtBridge
 import XCTest
 
+@MainActor
 final class QtBridgeQuickTest: XCTestCase {
-    func testQtQuick() {
+    func testQtQuick() async {
         var testModule = QmlTestModule(uri: "QtBridgeTest",
                                        major: 1, minor: 0,
                                        singletons: [:])

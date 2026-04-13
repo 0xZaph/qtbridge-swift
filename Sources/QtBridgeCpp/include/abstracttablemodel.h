@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include "callbackbase.h"
-
 #include <QtCore/qabstractitemmodel.h>
 
 #include <memory>
 
 #include <swift/bridging>
+
+#include "callbackbase.h"
+#include "swiftinterop.h"
 
 class QAbstractTableModelCpp
 {
@@ -30,11 +31,11 @@ public:
     QAbstractTableModel* getModel() const;
     QVariant toVariant() const;
 
-    static void registerRowCount(CallbackBase::RowCountFunc rowCountCallback);
-    static void registerColumnCount(CallbackBase::ColumnCountFunc columnCountCallback);
-    static void registerData(CallbackBase::DataFunc dataCallback);
-    static void registerSetData(CallbackBase::SetDataFunc setDataCallback);
-    static void registerHeaderData(CallbackBase::HeaderDataFunc headerDataCallback);
+    static void registerRowCount(SWIFT_MAIN_ACTOR CallbackBase::RowCountFunc rowCountCallback);
+    static void registerColumnCount(SWIFT_MAIN_ACTOR CallbackBase::ColumnCountFunc columnCountCallback);
+    static void registerData(SWIFT_MAIN_ACTOR CallbackBase::DataFunc dataCallback);
+    static void registerSetData(SWIFT_MAIN_ACTOR CallbackBase::SetDataFunc setDataCallback);
+    static void registerHeaderData(SWIFT_MAIN_ACTOR CallbackBase::HeaderDataFunc headerDataCallback);
 
     void beginInsertRows(const QModelIndex parent, int first, int last);
     void endInsertRows();

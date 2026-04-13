@@ -59,10 +59,11 @@
 /// `RangeReplaceableCollection` and `MutableCollection` allowing
 /// elements to be accessed and modified using standard Swift
 /// collection APIs.
-public final class QListModel<Element: QVariantGettable>: RandomAccessCollection,
-                                                          RangeReplaceableCollection,
-                                                          MutableCollection,
-                                                          ExpressibleByArrayLiteral {
+@MainActor
+public final class QListModel<Element: QVariantGettable>: @MainActor RandomAccessCollection,
+                                                          @MainActor RangeReplaceableCollection,
+                                                          @MainActor MutableCollection,
+                                                          @MainActor ExpressibleByArrayLiteral {
     private var storage: [Element]
     private let model: QAbstractListModel
 

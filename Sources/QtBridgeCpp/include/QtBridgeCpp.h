@@ -12,6 +12,7 @@
 #include "qobjectproxy.h"
 #include "qobjectproxyimpl.h"
 #include "qtestappcpp.h"
+#include "swiftinterop.h"
 #include "swiftmetaobjectbuilder.h"
 #include "swiftobjectaccesor.h"
 #include "swiftqmlelementbuilder.h"

@@ -19,8 +19,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Verify compiler requirements
-if("${CMAKE_Swift_COMPILER_VERSION}" VERSION_LESS 6.0)
-  message(FATAL_ERROR "QtBridge requires Swift 6.0 or greater. Have ${CMAKE_Swift_COMPILER_VERSION}")
+if("${CMAKE_Swift_COMPILER_VERSION}" VERSION_LESS 6.2)
+  message(FATAL_ERROR "QtBridge requires Swift 6.2 or greater. Have ${CMAKE_Swift_COMPILER_VERSION}")
 endif()
 
 include(cmake/QtBridgesSwiftHelpers.cmake)

@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include "callbackbase.h"
-
 #include <QtCore/qabstractitemmodel.h>
 
 #include <memory>
 
 #include <swift/bridging>
+
+#include "callbackbase.h"
+#include "swiftinterop.h"
 
 class QAbstractListModelCpp
 {
@@ -33,10 +34,10 @@ public:
     QAbstractListModel* getModel() const;
     QVariant toVariant() const;
 
-    static void registerRowCount(CallbackBase::RowCountFunc rowCountCallback);
-    static void registerData(CallbackBase::DataFunc dataCallback);
-    static void registerSetData(CallbackBase::SetDataFunc setDataCallback);
-    static void registerRoleNames(CallbackBase::RoleNamesFunc roleNamesCallback);
+    static void registerRowCount(SWIFT_MAIN_ACTOR CallbackBase::RowCountFunc rowCountCallback);
+    static void registerData(SWIFT_MAIN_ACTOR CallbackBase::DataFunc dataCallback);
+    static void registerSetData(SWIFT_MAIN_ACTOR CallbackBase::SetDataFunc setDataCallback);
+    static void registerRoleNames(SWIFT_MAIN_ACTOR CallbackBase::RoleNamesFunc roleNamesCallback);
 
     void beginInsertRows(const QModelIndex parent, int first, int last);
     void endInsertRows();

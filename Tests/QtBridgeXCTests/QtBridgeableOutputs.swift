@@ -16,7 +16,7 @@ enum QtBridgableOutputs {
     """
 
     static func builderVar(className: String) -> String { """
-    nonisolated(unsafe) static public let metaObjectBuilder: QtBridge.QMetaObjectBuilder = {
+    static public let metaObjectBuilder: QtBridge.QMetaObjectBuilder = {
             return QtBridge.QMetaObjectBuilder.create(from: \(className).self)
         }()
     """

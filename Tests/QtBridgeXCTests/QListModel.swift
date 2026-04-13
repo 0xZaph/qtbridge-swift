@@ -329,7 +329,8 @@ final class QListModelTests: XCTestCase {
         )
     }
 
-    func testQListModelCollectionBehavior() {
+    @MainActor
+    func testQListModelCollectionBehavior() async {
         var simpleModel = QListModel<Int>([1, 2, 3])
         XCTAssertEqual(simpleModel.startIndex, 0)
         XCTAssertEqual(simpleModel.endIndex, 3)

@@ -64,9 +64,6 @@ public struct QtBridgeableMacro {
 
     static func builderVariable(className: String) -> DeclSyntax {
         let modifiers = DeclModifierListSyntax {
-            DeclModifierSyntax(
-                name: .identifier("nonisolated(unsafe)")
-            )
             DeclModifierSyntax(name: .identifier("static"))
             DeclModifierSyntax(name: .identifier("public"))
         }

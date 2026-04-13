@@ -10,6 +10,7 @@ import QtBridgeCpp
 import QmlImports
 #endif // !QT_IS_CMAKE_BUILD
 
+@MainActor
 internal class QMLApp {
     var qmlApp: QAppCpp
 

@@ -12,6 +12,7 @@ import QtBridgeCpp
 /// ``QVariantSettable``. Qt Bridge provides built-in support
 /// for common Swift types such as `Int`, `UInt`, `Bool`,
 /// `Double`, `Float`, `String`, and array of `String` elements.
+@MainActor
 public struct QVariant
 {
     private var variant : QtBridgeCpp.QVariant
@@ -121,6 +122,7 @@ public struct QVariant
 ///
 /// Conforming to this protocol allows a Swift type to be exposed
 /// to QML as a read-only value.
+@MainActor
 public protocol QVariantGettable {
     /// Converts the value to a `QVariant`.
     func toVariant() -> QVariant

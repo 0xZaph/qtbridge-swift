@@ -15,6 +15,7 @@
 /// If the referenced property is mutable, the value can also be
 /// edited from the view, updating the corresponding value in
 /// the row object.
+@MainActor
 public struct QTableColumn<Row: QObjectBuildable> {
     /// The title displayed for the column
     public var header: String
@@ -143,6 +144,7 @@ public struct QTableColumnBuilder<Row: QObjectBuildable> {
 /// }
 /// ```
 ///
+@MainActor
 public final class QTableModel<Row: QObjectBuildable> {
     private var rows: [Row]
     private var columns: [QTableColumn<Row>]

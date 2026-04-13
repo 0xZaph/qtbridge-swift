@@ -11,6 +11,7 @@ import QtBridgeCpp
 /// Don't use this type directly. Instead, apply the
 /// ``QtBridgeable()`` macro to a class to add the required
 /// implementation automatically.
+@MainActor
 public class QMetaObjectBuilder
 {
     private let className: String

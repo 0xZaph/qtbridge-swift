@@ -3,6 +3,7 @@
 
 import QtBridgeCpp
 
+@MainActor
 public class QMetaParamsList {
     private let args : MetaParamsList
 
@@ -30,6 +31,7 @@ public class QMetaParamsList {
     }
 }
 
+@MainActor
 public protocol QMetaParamsGettable {
     static func get(from params: QMetaParamsList, index: Int) -> Self
 }
