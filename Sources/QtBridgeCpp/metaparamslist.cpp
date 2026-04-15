@@ -25,9 +25,9 @@ int MetaParamsList::size() const
 
 bool MetaParamsList::getBool(size_t i) const { return getT<bool>(i); }
 
-int64_t MetaParamsList::getInt(size_t i) const { return getT<int64_t>(i); }
+int MetaParamsList::getInt(size_t i) const { return getT<int>(i); }
 
-uint64_t MetaParamsList::getUInt(size_t i) const { return getT<uint64_t>(i); }
+unsigned int MetaParamsList::getUInt(size_t i) const { return getT<unsigned int>(i); }
 
 float MetaParamsList::getFloat(size_t i) const { return getT<float>(i); }
 
@@ -38,11 +38,10 @@ std::string MetaParamsList::getString(size_t i) const
     return getT<QString>(i).toStdString();
 }
 
-std::vector<std::string> MetaParamsList::getStringList(size_t i) const {
-    const auto list = getT<QStringList>(i);
-    std::vector<std::string> result;
-    result.reserve(list.size());
-    for (const QString& qstr : list)
-        result.push_back(qstr.toStdString());
-    return result;
+QStringList MetaParamsList::getStringList(size_t i) const {
+    return getT<QStringList>(i);
+}
+
+QVariantMap MetaParamsList::getVariantMap(size_t i) const {
+    return getT<QVariantMap>(i);
 }

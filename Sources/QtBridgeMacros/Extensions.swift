@@ -13,6 +13,14 @@ extension VariableDeclSyntax {
        return bindings.first?.typeAnnotation?.type.trimmed.description
     }
 
+    var isSupportedSettableType: Bool {
+        return bindings.first?.typeAnnotation?.type.isSupportedSettableType ?? false
+    }
+
+    var isSupportedGettableType: Bool {
+        return bindings.first?.typeAnnotation?.type.isSupportedGettableType ?? false
+    }
+
     var isImmutable: Bool {
         bindingSpecifier.tokenKind == .keyword(.let)
     }
@@ -103,5 +111,72 @@ extension FunctionDeclSyntax {
         attributes.contains(where: { attr in
             attr.as(AttributeSyntax.self)?.attributeName.trimmedDescription == attributeName
         })
+    }
+}
+
+extension TypeSyntax {
+    var isSupportedSettableType: Bool {
+        return isSupportedBasicType || isVariantMapType
+    }
+
+    var isSupportedGettableType: Bool {
+        return isSupportedSettableType || isListModelType || isTableModelType
+    }
+
+    var isSupportedReturnType: Bool {
+        return isSupportedSettableType || isVoid
+    }
+
+    var isVoid: Bool {
+        if let definedReturn = self.as(IdentifierTypeSyntax.self),
+           definedReturn.name.text == "Void" {
+            return true
+        }
+
+        if let tuple = self.as(TupleTypeSyntax.self), tuple.elements.isEmpty {
+            return true
+        }
+
+        return false
+    }
+
+    private static let supportedBasicTypes: Set<String> = [
+        "Int", "UInt", "Double", "Float", "String", "Bool", "[String]", "Array<String>"
+    ]
+
+    private var isSupportedBasicType: Bool {
+        return Self.supportedBasicTypes.contains(trimmed.description)
+    }
+
+    private var isListModelType: Bool {
+        let t = trimmed.description.replacingOccurrences(of: " ", with: "")
+        return t.hasPrefix("QListModel<") && t.hasSuffix(">")
+    }
+
+    private var isTableModelType: Bool {
+        let t = trimmed.description.replacingOccurrences(of: " ", with: "")
+        return t.hasPrefix("QTableModel<") && t.hasSuffix(">")
+    }
+
+    private var isVariantMapType: Bool {
+        // [String: QVariantSettable]
+        if let dictType = self.as(DictionaryTypeSyntax.self) {
+            let keyIsString = dictType.key.trimmed.description == "String"
+            let valueIsQVariant = dictType.value.trimmed.description == "QVariantSettable"
+            return keyIsString && valueIsQVariant
+        }
+
+        // Dictionary<String, QVariantSettable>
+        if let identType = self.as(IdentifierTypeSyntax.self),
+           identType.name.text == "Dictionary",
+           let args = identType.genericArgumentClause?.arguments,
+           args.count == 2
+        {
+            let keyIsString   = args[args.startIndex].argument.trimmed.description == "String"
+            let valueIsQVariant = args[args.index(after: args.startIndex)].argument.trimmed.description == "QVariantSettable"
+            return keyIsString && valueIsQVariant
+        }
+
+        return false
     }
 }

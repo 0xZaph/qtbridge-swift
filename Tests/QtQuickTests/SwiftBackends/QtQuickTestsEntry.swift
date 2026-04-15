@@ -15,6 +15,7 @@ final class QtBridgeQuickTest: XCTestCase {
 
         testModule.singletons["PhoneBookModel"] = PhoneBookModel()
         testModule.singletons["ListModel"] = ListModel()
+        testModule.singletons["PropertiesModel"] = PropertiesModel()
         testModule.singletons["SimpleQListModel"] = SimpleQListModel()
         testModule.singletons["SignalsModel"] = SignalsModel()
         testModule.singletons["SlotsModel"] = SlotsModel()

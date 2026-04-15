@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only
 
 set(QTBRIDGE_SWIFT_SOURCES
+    Extensions.swift
     QAbstractItemModel.swift
     QAbstractListModel.swift
     QAbstractTableModel.swift

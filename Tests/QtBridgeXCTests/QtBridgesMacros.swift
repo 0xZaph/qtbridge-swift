@@ -304,6 +304,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 var someString: String = "some String"
                 var someArray: [String] = ["some Array"]
                 var someArrayTwo: Array<String> = ["some Array"]
+                var someVariantMap1: [ String : QVariantSettable ] = [:]
+                var someVariantMap2: Dictionary< String, QVariantSettable > /* some comment */ = [:]
             }
             """,
             expandedSource:
@@ -325,6 +327,10 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 var someArray: [String] = ["some Array"]
                 @QtTracked
                 var someArrayTwo: Array<String> = ["some Array"]
+                @QtTracked
+                var someVariantMap1: [ String : QVariantSettable ] = [:]
+                @QtTracked
+                var someVariantMap2: Dictionary< String, QVariantSettable > /* some comment */ = [:]
 
                 \(QtBridgableOutputs.privateHolderVar)
 
@@ -372,6 +378,16 @@ final class QtBridgeableExpansionTest: XCTestCase {
                     builder.registerProperty(
                         name: "someArrayTwo",
                         keyPath: \\TestModel.someArrayTwo
+                    )
+
+                    builder.registerProperty(
+                        name: "someVariantMap1",
+                        keyPath: \\TestModel.someVariantMap1
+                    )
+
+                    builder.registerProperty(
+                        name: "someVariantMap2",
+                        keyPath: \\TestModel.someVariantMap2
                     )
                 }
 

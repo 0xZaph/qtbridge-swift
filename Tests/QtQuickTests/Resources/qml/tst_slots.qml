@@ -28,5 +28,17 @@ TestCase {
         compare(SlotsModel.addFloats(2.2, 1.1), 3.3)
         compare(SlotsModel.concatStrings("Hello", "World"), "Hello, World")
         compare(SlotsModel.makeList("Hi", "Bye"), ["Hi","Bye"])
+
+        let map = {
+            "name": "Alice",
+            "isActive": true,
+            "score": 77
+        }
+        let returnValue = SlotsModel.addElementToMap(map, "username", "alice123")
+        compare(Object.keys(returnValue).length, 4)
+        compare(returnValue["name"], "Alice")
+        compare(returnValue["isActive"], true)
+        compare(returnValue["score"], 77)
+        compare(returnValue["username"], "alice123")
     }
 }

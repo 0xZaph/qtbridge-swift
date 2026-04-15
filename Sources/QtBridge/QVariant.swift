@@ -15,7 +15,7 @@ import QtBridgeCpp
 @MainActor
 public struct QVariant
 {
-    private var variant : QtBridgeCpp.QVariant
+    private var variant: QtBridgeCpp.QVariant
 
     internal init(value: QtBridgeCpp.QVariant) {
         self.variant = value
@@ -31,13 +31,13 @@ public struct QVariant
     ///
     /// - Parameter value: The integer value to store.
     public init(value: Int) {
-        self.variant = QtBridgeCpp.QVariant(Int64(value))
+        self.variant = QtBridgeCpp.QVariant(CInt(value))
     }
     /// Creates a variant containing an unsigned integer value.
     ///
     /// - Parameter value: The unsigned integer value to store.
     public init(value: UInt) {
-        self.variant = QtBridgeCpp.QVariant(UInt64(value))
+        self.variant = QtBridgeCpp.QVariant(CUnsignedInt(value))
     }
     /// Creates a variant containing a Boolean value.
     ///
@@ -69,13 +69,7 @@ public struct QVariant
     public init(value: [String]) {
         var list: QStringList = QStringList()
         value.forEach { str in
-#if QT_IS_CXX_20
-            // QString.init(_:) becomes ambiguous with C++20
-            let stdStr = std.string(str)
-            list.append(QString.fromStdString(stdStr))
-#else
-            list.append(QString(str))
-#endif
+            list.append(str.toQString())
         }
         self.variant = QtBridgeCpp.QVariant(list)
     }
@@ -87,6 +81,15 @@ public struct QVariant
     public init(value: QObjectBuildable) {
         self.variant = value.objectHolder.proxy.toVariant()
     }
+
+    public init(value: [String: QVariantSettable]) {
+        var map: QtBridgeCpp.QVariantMap = QtBridgeCpp.QVariantMap()
+        value.forEach { key, value in
+            map[key.toQString()] = value.toVariant().cppVariant()
+        }
+        self.variant = QtBridgeCpp.QVariant(map)
+    }
+
     internal init(model: QAbstractListModel) {
         self.variant = model.getCppModel().toVariant()
     }
@@ -103,14 +106,32 @@ public struct QVariant
     fileprivate func toUInt() -> UInt { return UInt(variant.toUInt()) }
     fileprivate func toDouble() -> Double { return variant.toDouble() }
     fileprivate func toFloat() -> Float { return variant.toFloat()}
-    fileprivate func toString() -> String { return String(variant.toString().toStdString()) }
+    fileprivate func toString() -> String { return variant.toString().toSwiftString() }
     fileprivate func toStringList() -> [String] {
-        var result : [String] = []
-        let cppStrings = variant.toStringList()
-        for i in 0..<cppStrings.size() {
-            result.append(String(cppStrings[i].toStdString()))
+        var result: [String] = []
+        let list = variant.toStringList()
+        for i in 0..<list.size() {
+            result.append(list[i].toSwiftString())
         }
         return result
+    }
+    fileprivate func toMap() -> [String: QVariantSettable] {
+        return variant.toMap().toBridgeMap()
+    }
+
+    internal func toSettable() -> QVariantSettable? {
+        let typeId = variant.typeId()
+        if typeId == Bool.metaType() { return Bool.value(from: self) }
+        if typeId == Int.metaType() { return Int.value(from: self) }
+        if typeId == UInt.metaType() { return UInt.value(from: self) }
+        if typeId == Double.metaType() { return Double.value(from: self) }
+        if typeId == Float.metaType() { return Float.value(from: self) }
+        if typeId == String.metaType() { return String.value(from: self) }
+        if typeId == [String].metaType() { return [String].value(from: self) }
+        if typeId == [String: QVariantSettable].metaType() {
+            return [String: QVariantSettable].value(from: self)
+        }
+        return nil
     }
 
     internal func cppVariant() -> QtBridgeCpp.QVariant {
@@ -153,13 +174,13 @@ extension Bool: QVariantSettable {
 extension Int: QVariantSettable {
     public func toVariant() -> QVariant { QVariant(value: self) }
     public static func value(from variant: QVariant) -> Int { variant.toInt() }
-    public static func metaType() -> Int32 { return 4 }
+    public static func metaType() -> Int32 { return 2 }
 }
 
 extension UInt: QVariantSettable {
     public func toVariant() -> QVariant { QVariant(value: self) }
     public static func value(from variant: QVariant) -> UInt { variant.toUInt() }
-    public static func metaType() -> Int32 { return 5 }
+    public static func metaType() -> Int32 { return 3 }
 }
 
 extension Double: QVariantSettable {
@@ -187,4 +208,13 @@ extension Array: QVariantGettable where Element == String {
 
 extension Array: QVariantSettable where Element == String {
     public static func value(from variant: QVariant) -> [String] { variant.toStringList() }
+}
+
+extension Dictionary: QVariantGettable where Key == String, Value == any QVariantSettable {
+    public func toVariant() -> QVariant { QVariant(value: self) }
+    public static func metaType() -> Int32 { return 8 }
+}
+
+extension Dictionary: QVariantSettable where Key == String, Value == any QVariantSettable {
+    public static func value(from variant: QVariant) -> [String : QVariantSettable] { variant.toMap() }
 }

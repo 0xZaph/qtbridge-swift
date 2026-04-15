@@ -28,4 +28,9 @@ public final class SlotsModel {
     public func makeList(first: String, second: String) -> [String] {
         return [first, second]
     }
+    public func addElementToMap(map: [String: QVariantSettable], key: String, value: String) -> [String: QVariantSettable] {
+        var newMap = map
+        newMap[key] = value as QVariantSettable
+        return newMap
+    }
 }

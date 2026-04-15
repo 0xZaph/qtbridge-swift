@@ -120,33 +120,14 @@ public struct QtBridgeableMacro {
         """
     }
 
-    private static let supportedBasicTypes: Set<String> = [
-        "Int", "UInt", "Double", "Float", "String", "Bool", "[String]", "Array<String>"
-    ]
-
-    static func isSupportedBasicType(type: String) -> Bool {
-        return supportedBasicTypes.contains(type)
-    }
-
-    static func isQListModelType(type: String) -> Bool {
-        let t = type.replacingOccurrences(of: " ", with: "")
-        return t.hasPrefix("QListModel<") && t.hasSuffix(">")
-    }
-
-    static func isQTableModelType(type: String) -> Bool {
-        let t = type.replacingOccurrences(of: " ", with: "")
-        return t.hasPrefix("QTableModel<") && t.hasSuffix(">")
-    }
-
     private static func buildArgTypes(params: FunctionParameterListSyntax,
                                       arrayName: String) -> (arrayInit: String, pushCalls: [String])?
     {
         var pushCalls: [String] = []
 
         for param in params {
-            let paramType = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard isSupportedBasicType(type: paramType) else { return nil }
-            pushCalls.append("\(arrayName).append(\(paramType).self)")
+            guard param.type.isSupportedSettableType else { return nil }
+            pushCalls.append("\(arrayName).append(\(param.type.trimmed.description).self)")
         }
 
         let arrayVar = pushCalls.isEmpty ? "let" : "var"
@@ -223,31 +204,16 @@ public struct QtBridgeableMacro {
             : "self.\(methodName)(\(args.joined(separator: ", ")))"
 
         let returnClauseType = functionDecl.signature.returnClause?.type
-        let returnTypeString = returnClauseType?.description
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-
-        let isReturnVoid: Bool = {
-            guard let returnClauseType = returnClauseType else {
-                return true
-            }
-            if let definedReturn = returnClauseType.as(IdentifierTypeSyntax.self),
-               definedReturn.name.text == "Void" {
-                return true
-            }
-            if let tuple = returnClauseType.as(TupleTypeSyntax.self), tuple.elements.isEmpty {
-                return true
-            }
-            return false
-        }()
-
-        if !isReturnVoid && !isSupportedBasicType(type: returnTypeString) {
+        let isSupportedReturnType = returnClauseType?.isSupportedReturnType ?? true
+        if (!isSupportedReturnType) {
             return
         }
 
-        let returnType: String = isReturnVoid ? "nil" : "\(returnTypeString).self"
-
+        let returnsVoid = returnClauseType?.isVoid ?? true
+        let returnTypeString = returnClauseType?.trimmed.description ?? ""
+        let returnType: String = returnsVoid ? "nil" : "\(returnTypeString).self"
         let returnBody: String = {
-            if isReturnVoid {
+            if returnsVoid {
                 return """
                 \(call)
                     return QVariant()
@@ -290,19 +256,12 @@ public struct QtBridgeableMacro {
             return
         }
 
-        let propertyName = variableDecl.identifier!.text
-        var isSupportedType : Bool = false
-        if let propertyType = variableDecl.type {
-            isSupportedType = isSupportedBasicType(type: propertyType)
-                              || isQListModelType(type: propertyType)
-                                || isQTableModelType(type: propertyType)
-        }
-
-        guard isSupportedType
+        guard variableDecl.isSupportedGettableType
                 || variableDecl.hasAttribute(QtBridgeableMacro.trackedMacroName) else {
             return
         }
 
+        let propertyName = variableDecl.identifier!.text
         let registrationCode =
         """
         builder.registerProperty(
@@ -447,10 +406,7 @@ extension QtBridgeableMacro: MemberAttributeMacro {
             return []
         }
 
-        guard isSupportedBasicType(type: property.type!) ||
-                isQListModelType(type: property.type!) ||
-                isQTableModelType(type: property.type!)
-        else { return [] }
+        guard property.isSupportedGettableType else { return [] }
 
         return [
             AttributeSyntax(
@@ -519,10 +475,9 @@ public struct QtSignalMacro: BodyMacro {
 
         var argType: [String] = []
         for param in params {
-            let paramType = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard QtBridgeableMacro.isSupportedBasicType(type: paramType) else {
+            guard param.type.isSupportedSettableType else {
                 throw DiagnosticsError(syntax: node,
-                                       message: "Unsupported parameter type: \(paramType)",
+                                       message: "Unsupported parameter type: \(param.type.trimmed.description)",
                                        id: .invalidApplication)
             }
             let paramName = param.firstName.text

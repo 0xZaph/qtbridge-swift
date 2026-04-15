@@ -174,6 +174,33 @@ public class QMetaObjectBuilder
         name: String,
         keyPath: WritableKeyPath<Root, Member>)
     {
+        registerProperty(name: name, keyPath: keyPath) { newValue, root in
+            newValue != root[keyPath: keyPath]
+        }
+    }
+
+    /// Registers a writable property that can be accessed and
+    /// modified from QML. The setter always assigns the new value
+    /// without equality checking.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the property exposed to QML.
+    ///   - keyPath: A writable keypath to the property.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
+    public func registerProperty<Root: QObjectBuildable, Member: QVariantSettable>(
+        name: String,
+        keyPath: WritableKeyPath<Root, Member>)
+    {
+        registerProperty(name: name, keyPath: keyPath, isChanged: { _, _ in true })
+    }
+
+    private func registerProperty<Root: QObjectBuildable, Member: QVariantSettable>(
+        name: String,
+        keyPath: WritableKeyPath<Root, Member>,
+        isChanged: @escaping (Member, Root) -> Bool)
+    {
         registerSignal(for: name)
 
         let propInfoId = Int32(properties.count)
@@ -191,7 +218,7 @@ public class QMetaObjectBuilder
                 return false
             }
             let newValue: Member = variant.value()
-            if newValue == root[keyPath: keyPath] {
+            if !isChanged(newValue, root) {
                 return false
             }
             root[keyPath: keyPath] = newValue

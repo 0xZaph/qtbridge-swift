@@ -5,9 +5,9 @@ import QtBridgeCpp
 
 @MainActor
 public class QMetaParamsList {
-    private let args : MetaParamsList
+    private let args: MetaParamsList
 
-    internal init(args : MetaParamsList) {
+    internal init(args: MetaParamsList) {
         self.args = args
     }
 
@@ -23,11 +23,14 @@ public class QMetaParamsList {
     fileprivate func getString(_ index: Int) -> String { return String(args.getString(index)) }
     fileprivate func getStringList(_ index: Int) -> [String] {
         var result : [String] = []
-        let cppStrings = args.getStringList(index)
-        for i in 0..<cppStrings.size() {
-            result.append(String(cppStrings[i]))
+        let list = args.getStringList(index)
+        for i in 0..<list.size() {
+            result.append(list[i].toSwiftString())
         }
         return result
+    }
+    fileprivate func getMap(_ index: Int) -> [String: QVariantSettable] {
+        return args.getVariantMap(index).toBridgeMap()
     }
 }
 
@@ -75,5 +78,11 @@ extension String: QMetaParamsGettable {
 extension Array: QMetaParamsGettable where Element == String {
     public static func get(from params: QMetaParamsList, index: Int) -> [String] {
         return params.getStringList(index)
+    }
+}
+
+extension Dictionary: QMetaParamsGettable where Key == String, Value == any QVariantSettable {
+    public static func get(from params: QMetaParamsList, index: Int) -> [String: QVariantSettable] {
+        return params.getMap(index)
     }
 }

@@ -65,6 +65,11 @@ TestCase {
         signalName: "changeStringList"
     }
     SignalSpy {
+        id: changeVariantMapSpy
+        target: SignalsModel
+        signalName: "changeVariantMap"
+    }
+    SignalSpy {
         id: changeMultipleParamsSpy
         target: SignalsModel
         signalName: "changeMultipleParams"
@@ -137,40 +142,57 @@ TestCase {
         changeFloatSpy.clear()
         changeStringSpy.clear()
         changeStringListSpy.clear()
+        changeVariantMapSpy.clear()
         changeMultipleParamsSpy.clear()
 
         SignalsModel.triggerSignals(true, 42, 4, 4.2222, 4.2,
-                                    "Forty-two", ["Forty", "Two"])
+                                    "Forty-two", ["Forty", "Two"],
+                                    {"score": 42})
         // No arguments
         tryCompare(signalOneSpy, "count", 1, 200)
+
         // Bool
         compare(changeBoolSpy.count, 1)
         compare(changeBoolSpy.signalArguments[0].length, 1)
         compare(changeBoolSpy.signalArguments[0][0], true)
+
         // Int
         compare(changeIntSpy.count, 1)
         compare(changeIntSpy.signalArguments[0].length, 1)
         compare(changeIntSpy.signalArguments[0][0], 42)
+
         // UInt
         compare(changeUIntSpy.count, 1)
         compare(changeUIntSpy.signalArguments[0].length, 1)
         compare(changeUIntSpy.signalArguments[0][0], 4)
+
         //Double
         compare(changeDoubleSpy.count, 1)
         compare(changeDoubleSpy.signalArguments[0].length, 1)
         compare(changeDoubleSpy.signalArguments[0][0], 4.2222)
+
         // Float
         compare(changeFloatSpy.count, 1)
         compare(changeFloatSpy.signalArguments[0].length, 1)
         compare(changeFloatSpy.signalArguments[0][0], 4.2)
+
         // String
         compare(changeStringSpy.count, 1)
         compare(changeStringSpy.signalArguments[0].length, 1)
         compare(changeStringSpy.signalArguments[0][0], "Forty-two")
+
         // String List
         compare(changeStringListSpy.count, 1)
         compare(changeStringListSpy.signalArguments[0].length, 1)
         compare(changeStringListSpy.signalArguments[0][0], ["Forty", "Two"])
+
+        // QVariantMap
+        compare(changeVariantMapSpy.count, 1)
+        compare(changeVariantMapSpy.signalArguments[0].length, 1)
+        let mapArg = changeVariantMapSpy.signalArguments[0][0]
+        compare(Object.keys(mapArg).length, 1)
+        compare(mapArg["score"], 42)
+
         // Multiple Args
         compare(changeMultipleParamsSpy.count, 1)
         compare(changeMultipleParamsSpy.signalArguments[0].length, 3)
@@ -188,45 +210,63 @@ TestCase {
         changeFloatSpy.clear()
         changeStringSpy.clear()
         changeStringListSpy.clear()
+        changeVariantMapSpy.clear()
         changeMultipleParamsSpy.clear()
+
         // No arguments
         SignalsModel.signalOne()
         tryCompare(signalOneSpy, "count", 1, 200)
+
         // Bool
         SignalsModel.changeBool(true)
         tryCompare(changeBoolSpy, "count", 1, 200)
         compare(changeBoolSpy.signalArguments[0].length, 1)
         compare(changeBoolSpy.signalArguments[0][0], true)
+
         // Int
         SignalsModel.changeInt(130000)
         tryCompare(changeIntSpy, "count", 1, 200)
         compare(changeIntSpy.signalArguments[0].length, 1)
         compare(changeIntSpy.signalArguments[0][0], 130000)
+
         // UInt
         SignalsModel.changeUInt(13)
         tryCompare(changeUIntSpy, "count", 1, 200)
         compare(changeUIntSpy.signalArguments[0].length, 1)
         compare(changeUIntSpy.signalArguments[0][0], 13)
+
         // Double
         SignalsModel.changeDouble(1.33333)
         tryCompare(changeDoubleSpy, "count", 1, 200)
         compare(changeDoubleSpy.signalArguments[0].length, 1)
         compare(changeDoubleSpy.signalArguments[0][0], 1.33333)
+
         // Float
         SignalsModel.changeFloat(1.33)
         tryCompare(changeFloatSpy, "count", 1, 200)
         compare(changeFloatSpy.signalArguments[0].length, 1)
         compare(changeFloatSpy.signalArguments[0][0], 1.33)
+
         // String
         SignalsModel.changeString("Hello!")
         tryCompare(changeStringSpy, "count", 1, 200)
         compare(changeStringSpy.signalArguments[0].length, 1)
         compare(changeStringSpy.signalArguments[0][0], "Hello!")
+
         // String List
         SignalsModel.changeStringList(["Hi!", "Bye!"])
         tryCompare(changeStringListSpy, "count", 1, 200)
         compare(changeStringListSpy.signalArguments[0].length, 1)
         compare(changeStringListSpy.signalArguments[0][0], ["Hi!", "Bye!"])
+
+        // QVariantMap
+        SignalsModel.changeVariantMap({"name": "Rue"})
+        tryCompare(changeVariantMapSpy, "count", 1, 200)
+        compare(changeVariantMapSpy.signalArguments[0].length, 1)
+        let mapArg = changeVariantMapSpy.signalArguments[0][0]
+        compare(Object.keys(mapArg).length, 1)
+        compare(mapArg["name"], "Rue")
+
         // Multiple arguments
         SignalsModel.changeMultipleParams(true, 13, "Bye")
         tryCompare(changeMultipleParamsSpy, "count", 1, 200)

@@ -25,12 +25,13 @@ public:
     int size() const;
 
     bool getBool(size_t i) const;
-    int64_t getInt(size_t i) const;
-    uint64_t getUInt(size_t i) const;
+    int getInt(size_t i) const;
+    unsigned int getUInt(size_t i) const;
     float getFloat(size_t i) const;
     double getDouble(size_t i) const;
     std::string getString(size_t i) const;
-    std::vector<std::string> getStringList(size_t i) const;
+    QStringList getStringList(size_t i) const;
+    QVariantMap getVariantMap(size_t i) const;
 
 private:
     template <typename T>

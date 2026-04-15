@@ -36,7 +36,9 @@ public final class SignalsModel {
     @QtSignal
     func changeString(text: String)
     @QtSignal
-    func changeStringList(text: [String])
+    func changeStringList(list: [String])
+    @QtSignal
+    func changeVariantMap(map: [String: QVariantSettable])
 
     // Signal with multiple parameters
     @QtSignal
@@ -52,7 +54,8 @@ public final class SignalsModel {
     }
 
     func triggerSignals(isTrue: Bool, myInt: Int, myUInt: UInt, myDouble: Double,
-                                     myFloat: Float, text: String, textList: [String]) {
+                        myFloat: Float, text: String, textList: [String],
+                        map: [String: QVariantSettable]) {
         signalOne()
         changeBool(isTrue: isTrue)
         changeInt(num: myInt)
@@ -60,7 +63,8 @@ public final class SignalsModel {
         changeDouble(num: myDouble)
         changeFloat(num: myFloat)
         changeString(text: text)
-        changeStringList(text: textList)
+        changeStringList(list: textList)
+        changeVariantMap(map: map)
         changeMultipleParams(isTrue: isTrue, num: myUInt, text: text)
     }
 }
