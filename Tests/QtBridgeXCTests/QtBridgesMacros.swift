@@ -302,8 +302,8 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 var someDouble: Double = 1.33
                 var someFloat: Float = 1.3
                 var someString: String = "some String"
-                var someArray: [String] = ["some Array"]
-                var someArrayTwo: Array<String> = ["some Array"]
+                var someArray: [ String] = ["some Array"]
+                var someArrayTwo: Array< String > = ["some Array"]
                 var someVariantMap1: [ String : QVariantSettable ] = [:]
                 var someVariantMap2: Dictionary< String, QVariantSettable > /* some comment */ = [:]
             }
@@ -324,9 +324,9 @@ final class QtBridgeableExpansionTest: XCTestCase {
                 @QtTracked
                 var someString: String = "some String"
                 @QtTracked
-                var someArray: [String] = ["some Array"]
+                var someArray: [ String] = ["some Array"]
                 @QtTracked
-                var someArrayTwo: Array<String> = ["some Array"]
+                var someArrayTwo: Array< String > = ["some Array"]
                 @QtTracked
                 var someVariantMap1: [ String : QVariantSettable ] = [:]
                 @QtTracked

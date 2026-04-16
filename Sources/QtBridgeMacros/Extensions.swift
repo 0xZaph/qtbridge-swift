@@ -116,7 +116,7 @@ extension FunctionDeclSyntax {
 
 extension TypeSyntax {
     var isSupportedSettableType: Bool {
-        return isSupportedBasicType || isVariantMapType
+        return isSupportedBasicType || isVariantMapType || isStringListType
     }
 
     var isSupportedGettableType: Bool {
@@ -141,7 +141,7 @@ extension TypeSyntax {
     }
 
     private static let supportedBasicTypes: Set<String> = [
-        "Int", "UInt", "Double", "Float", "String", "Bool", "[String]", "Array<String>"
+        "Int", "UInt", "Double", "Float", "String", "Bool"
     ]
 
     private var isSupportedBasicType: Bool {
@@ -175,6 +175,24 @@ extension TypeSyntax {
             let keyIsString   = args[args.startIndex].argument.trimmed.description == "String"
             let valueIsQVariant = args[args.index(after: args.startIndex)].argument.trimmed.description == "QVariantSettable"
             return keyIsString && valueIsQVariant
+        }
+
+        return false
+    }
+
+    private var isStringListType: Bool {
+        // [String]
+        if let arrayType = self.as(ArrayTypeSyntax.self) {
+            return arrayType.element.trimmed.description == "String"
+        }
+
+        // Array<String>
+        if let identType = self.as(IdentifierTypeSyntax.self),
+           identType.name.text == "Array",
+           let args = identType.genericArgumentClause?.arguments,
+           args.count == 1
+        {
+            return args[args.startIndex].argument.trimmed.description == "String"
         }
 
         return false
