@@ -562,4 +562,167 @@ final class QtBridgeableExpansionTest: XCTestCase {
             indentationWidth: .spaces(4)
         )
     }
+
+    func testSlotsWithSupportedReturnType() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class TestModel {
+                public func addInts(first: Int, second: Int) -> Int {
+                    return first + second
+                }
+                public func concatStrings(first: String, second: String) -> String {
+                    return first + " " + second
+                }
+                public func explicitVoid() -> Void {
+                    explicitVoid()
+                }
+                public func emptyTuple() -> () {
+                    emptyTuple()
+                }
+                public func implicitVoid() {
+                    implicitVoid()
+                }
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                public func addInts(first: Int, second: Int) -> Int {
+                    return first + second
+                }
+                public func concatStrings(first: String, second: String) -> String {
+                    return first + " " + second
+                }
+                public func explicitVoid() -> Void {
+                    explicitVoid()
+                }
+                public func emptyTuple() -> () {
+                    emptyTuple()
+                }
+                public func implicitVoid() {
+                    implicitVoid()
+                }
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "TestModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+                    var argTypes1 : [QVariantGettable.Type] = []
+                    argTypes1.append(Int.self)
+                    argTypes1.append(Int.self)
+                    builder.registerSlot(
+                        name: "addInts",
+                        returnType: Int.self,
+                        argTypes: argTypes1,
+                        method: { (owner: Any, args: QMetaParamsList) in
+                        guard let self = owner as? TestModel else {
+                            return QVariant()
+                        }
+                        let first : Int = args.get(0)
+                        let second : Int = args.get(1)
+                        return QVariant(value: self.addInts(first: first, second: second))
+                    })
+
+                    var argTypes2 : [QVariantGettable.Type] = []
+                    argTypes2.append(String.self)
+                    argTypes2.append(String.self)
+                    builder.registerSlot(
+                        name: "concatStrings",
+                        returnType: String.self,
+                        argTypes: argTypes2,
+                        method: { (owner: Any, args: QMetaParamsList) in
+                        guard let self = owner as? TestModel else {
+                            return QVariant()
+                        }
+                        let first : String = args.get(0)
+                        let second : String = args.get(1)
+                        return QVariant(value: self.concatStrings(first: first, second: second))
+                    })
+
+                    let argTypes3 : [QVariantGettable.Type] = []
+
+                    builder.registerSlot(
+                        name: "explicitVoid",
+                        returnType: nil,
+                        argTypes: argTypes3,
+                        method: { (owner: Any, args: QMetaParamsList) in
+                        guard let self = owner as? TestModel else {
+                            return QVariant()
+                        }
+
+                        self.explicitVoid()
+                        return QVariant()
+                    })
+
+                    let argTypes4 : [QVariantGettable.Type] = []
+
+                    builder.registerSlot(
+                        name: "emptyTuple",
+                        returnType: nil,
+                        argTypes: argTypes4,
+                        method: { (owner: Any, args: QMetaParamsList) in
+                        guard let self = owner as? TestModel else {
+                            return QVariant()
+                        }
+
+                        self.emptyTuple()
+                        return QVariant()
+                    })
+
+                    let argTypes5 : [QVariantGettable.Type] = []
+
+                    builder.registerSlot(
+                        name: "implicitVoid",
+                        returnType: nil,
+                        argTypes: argTypes5,
+                        method: { (owner: Any, args: QMetaParamsList) in
+                        guard let self = owner as? TestModel else {
+                            return QVariant()
+                        }
+
+                        self.implicitVoid()
+                        return QVariant()
+                    })
+                }
+            }
+            """,
+            macros: macros,
+            indentationWidth: .spaces(4)
+        )
+    }
+
+    func testSlotsWithUnsupportedReturnType() {
+        assertMacroExpansion(
+            """
+            @QtBridgeable
+            public class TestModel {
+                public func returnAny(first: Int, second: Int) -> Any {
+                    return first + second
+                }
+            }
+            """,
+            expandedSource:
+            """
+            public class TestModel {
+                public func returnAny(first: Int, second: Int) -> Any {
+                    return first + second
+                }
+
+                \(QtBridgableOutputs.holderVar)
+
+                \(QtBridgableOutputs.builderVar(className: "TestModel"))
+
+                public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+                    builder.startRegistration(for: self)
+
+                }
+            }
+            """,
+            macros: macros,
+            indentationWidth: .spaces(4)
+        )
+    }
 }

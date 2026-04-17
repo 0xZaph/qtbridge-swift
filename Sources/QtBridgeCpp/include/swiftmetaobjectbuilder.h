@@ -22,9 +22,10 @@ public:
     void setMetaObjectTo(QObjectProxy dst) const;
     const QMetaObject* metaObject() const;
 
-    using SlotFunc = void(*)(int, void *, void *, MetaParamsList);
+    using SlotFunc = QVariant(*)(int, void *, void *, MetaParamsList);
     void registerSlot(const char *name, void *builderPtr, int propertyId,
-                      const std::vector<int> &argTypeIds, SlotFunc callback);
+                      int returnTypeId, const std::vector<int> &argTypeIds,
+                      SlotFunc callback);
 
     void registerSignal(const char *name, const std::vector<int> &argTypeIds);
     void emitSignal(QObjectProxy sender, const char *name, const std::vector<QVariant> &args);

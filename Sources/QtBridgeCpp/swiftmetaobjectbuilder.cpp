@@ -108,7 +108,11 @@ public:
             if (auto& callback = slotIt->second.m_callback)
             {
                 const MetaParamsList params(method, argv);
-                callback(swiftObject, params);
+                QVariant result = callback(swiftObject, params);
+                if (argv[0] && method.returnType() != QMetaType::Void
+                    && result.metaType().id() == method.returnType()) {
+                    QMetaType(method.returnType()).construct(argv[0], result.constData());
+                }
                 return true;
             }
         }
@@ -173,7 +177,7 @@ public:
     }
 
     void registerSlot(const std::string &name, int propertyId,
-                      const std::vector<int> &argTypeIds,
+                      int returnTypeId, const std::vector<int> &argTypeIds,
                       void *builderPtr, SlotFunc callback)
     {
         if (!m_metaObjectBuilder)
@@ -182,11 +186,16 @@ public:
         const std::vector<QMetaType> metaTypes(argTypeIds.begin(), argTypeIds.end());
         QByteArray signature = generateFuncSignature(name, metaTypes);
         QMetaMethodBuilder builder = m_metaObjectBuilder->addSlot(signature);
+
+        QByteArray returnType = QMetaType(returnTypeId).name();
+        if (!returnType.isEmpty() && returnTypeId != QMetaType::Void) {
+            builder.setReturnType(returnType);
+        }
         const int localId = builder.index();
 
         SlotInfo info;
-        info.m_callback = [propertyId, builderPtr, callback](void *receiver, const MetaParamsList& params){
-            callback(propertyId, builderPtr, receiver, params);
+        info.m_callback = [propertyId, builderPtr, callback](void *receiver, const MetaParamsList& params) -> QVariant {
+            return callback(propertyId, builderPtr, receiver, params);
         };
 
         m_slots.emplace(localId, info);
@@ -314,7 +323,7 @@ public:
 private:
     struct SlotInfo
     {
-        std::function<void(void *receiver, const MetaParamsList&)> m_callback;
+        std::function<QVariant(void *receiver, const MetaParamsList&)> m_callback;
     };
     using SlotId = int;
     std::unordered_map<SlotId, SlotInfo> m_slots;
@@ -360,10 +369,11 @@ const QMetaObject* SwiftMetaObjectBuilder::metaObject() const
 void SwiftMetaObjectBuilder::registerSlot(const char *name,
                                           void *builderPtr,
                                           int propertyId,
+                                          int returnTypeId,
                                           const std::vector<int> &argTypeIds,
                                           SlotFunc callback)
 {
-    m_impl->registerSlot(name, propertyId, argTypeIds, builderPtr, callback);
+    m_impl->registerSlot(name, propertyId, returnTypeId, argTypeIds, builderPtr, callback);
 }
 
 void SwiftMetaObjectBuilder::registerSignal(const char *name, const std::vector<int> &argTypeIds)

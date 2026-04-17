@@ -20,6 +20,7 @@ public func runQtQuickTests() -> Int32 {
     let customQListModel = PhoneBookModel()
     let listModel = ListModel()
     let simpleQListModel = SimpleQListModel()
+    let slotsModel = SlotsModel()
 
     qTestApp.registerQmlSingleton("QtBridgeTest", 1, 0,
                                  "PhoneBookModel",
@@ -36,6 +37,10 @@ public func runQtQuickTests() -> Int32 {
     qTestApp.registerQmlSingleton("QtBridgeTest", 1, 0,
                                  "SignalsModel",
                                   signalsModel.objectHolder.proxy)
+
+    qTestApp.registerQmlSingleton("QtBridgeTest", 1, 0,
+                                 "SlotsModel",
+                                  slotsModel.objectHolder.proxy)
 
     let qmlDir = Bundle.module.url(forResource: "qml", withExtension: nil)!
     qTestApp.setInputDir(qmlDir.path)

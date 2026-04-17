@@ -32,7 +32,7 @@ public class QMetaObjectBuilder
     }
 
     private var properties: [PropertyData] = []
-    private var methods: [(Any, QMetaParamsList) -> Void] = []
+    private var methods: [(Any, QMetaParamsList) -> QVariant] = []
     private var bridgeRoot: ((UnsafeMutableRawPointer) -> Any?)?
 
     private init(type: QObjectBuildable.Type) {
@@ -271,9 +271,11 @@ public class QMetaObjectBuilder
     /// This method is used by the bridging system. Don't call it
     /// directly.
     public func registerSlot(name: String,
+                             returnType: QVariantGettable.Type? = nil,
                              argTypes: [QVariantGettable.Type],
-                             method: @escaping (Any, QMetaParamsList) -> Void)
+                             method: @escaping (Any, QMetaParamsList) -> QVariant)
     {
+        let returnTypeId = returnType?.metaType() ?? 43 // QMetaType::Void
         let methodId = Int32(methods.count)
         methods.append(method)
 
@@ -282,15 +284,17 @@ public class QMetaObjectBuilder
             metaArgs.push_back(type.metaType())
         }
 
-        builder.registerSlot(name, QMetaObjectBuilder.bridge(self), methodId, metaArgs,
+        builder.registerSlot(name, QMetaObjectBuilder.bridge(self), methodId, returnTypeId, metaArgs,
         { (methodId: Int32,
            selfPtr: UnsafeMutableRawPointer?,
            objPtr: UnsafeMutableRawPointer?,
-           params: MetaParamsList) -> Void in
+           params: MetaParamsList) -> QtBridgeCpp.QVariant in
             guard let selfPtr,
                   let mySelf = QMetaObjectBuilder.bridge(selfPtr)
-            else { return }
-            mySelf.invoke(methodIndex: Int(methodId), rootPtr: objPtr, args: QMetaParamsList(args: params))
+            else { return QtBridgeCpp.QVariant() }
+            return mySelf.invoke(
+                methodIndex: Int(methodId), rootPtr: objPtr,
+                args: QMetaParamsList(args: params)).cppVariant()
         })
     }
 
@@ -298,14 +302,14 @@ public class QMetaObjectBuilder
         builder.endMetaRegistration()
     }
 
-    private func invoke(methodIndex: Int, rootPtr: UnsafeMutableRawPointer?, args: QMetaParamsList) {
-        guard let rootPtr = rootPtr else { return }
-        guard let bridgeRoot = self.bridgeRoot else { return }
-        guard let root = bridgeRoot(rootPtr) else { return }
+    private func invoke(methodIndex: Int, rootPtr: UnsafeMutableRawPointer?, args: QMetaParamsList) -> QVariant {
+        guard let rootPtr = rootPtr else { return QVariant() }
+        guard let bridgeRoot = self.bridgeRoot else { return QVariant() }
+        guard let root = bridgeRoot(rootPtr) else { return QVariant() }
         guard methodIndex >= 0, methodIndex < methods.count else {
-            return
+            return QVariant()
         }
-        methods[methodIndex](root, args)
+        return methods[methodIndex](root, args)
     }
 
     private func getProperty(propIndex: Int, rootPtr: UnsafeMutableRawPointer?) -> QVariant {

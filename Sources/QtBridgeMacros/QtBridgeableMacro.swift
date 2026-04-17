@@ -199,19 +199,55 @@ public struct QtBridgeableMacro {
             ? "self.\(methodName)()"
             : "self.\(methodName)(\(args.joined(separator: ", ")))"
 
+        let returnClauseType = functionDecl.signature.returnClause?.type
+        let returnTypeString = returnClauseType?.description
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        let isReturnVoid: Bool = {
+            guard let returnClauseType = returnClauseType else {
+                return true
+            }
+            if let definedReturn = returnClauseType.as(IdentifierTypeSyntax.self),
+               definedReturn.name.text == "Void" {
+                return true
+            }
+            if let tuple = returnClauseType.as(TupleTypeSyntax.self), tuple.elements.isEmpty {
+                return true
+            }
+            return false
+        }()
+
+        if !isReturnVoid && !isSupportedBasicType(type: returnTypeString) {
+            return
+        }
+
+        let returnType: String = isReturnVoid ? "nil" : "\(returnTypeString).self"
+
+        let returnBody: String = {
+            if isReturnVoid {
+                return """
+                \(call)
+                    return QVariant()
+                """
+            } else {
+                return "return QVariant(value: \(call))"
+            }
+        }()
+
         let registration =
         """
         \(arrayInit)
         \(pushCalls.joined(separator: "\n"))
         builder.registerSlot(
             name: "\(methodName)",
+            returnType: \(returnType),
             argTypes: \(arrayName),
             method: { (owner: Any, args: \(paramsListName)) in
             guard let self = owner as? \(className) else {
-                return
+                return QVariant()
             }
             \(paramExtraction.joined(separator: "\n    "))
-            \(call)
+            \(returnBody)
         })
         """
 
