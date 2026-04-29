@@ -18,8 +18,8 @@ internal class QMLApp {
         self.qmlApp = QAppCpp()
     }
 
-    public func setImportPath(path: String) {
-        qmlApp.setImportPath(path)
+    public func addImportPath(path: String) {
+        qmlApp.addImportPath(path)
     }
 
     public func setPluginsPath(path: String) {
@@ -106,6 +106,10 @@ internal class QMLApp {
     /// different bundle. For example, when resources are
     /// provided by Swift Package Manager, you may need to
     /// return `Bundle.module`.
+    ///
+    /// The bundle's resource path is automatically added to
+    /// the QML engine's import paths, so any QML modules
+    /// inside the bundle can be imported by module name.
     var bundle: Bundle { get }
 
     /// Swift objects that should be exposed to QML.
@@ -148,9 +152,13 @@ internal class QMLApp {
         // the QML files and bundled plugins. For CMake builds the equivalent
         // resources come from the system Qt installation so this is skipped
         // when using CMake.
-        app.setImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
+        app.addImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         app.setPluginsPath(path: Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
         #endif // !QT_IS_CMAKE_BUILD
+
+        if let bundlePath = qApp.bundle.resourceURL?.path {
+            app.addImportPath(path: bundlePath)
+        }
 
         for type in qApp.instantiableTypes {
             type.registerQmlElement()

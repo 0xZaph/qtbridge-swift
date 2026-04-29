@@ -14,9 +14,9 @@ QAppCpp::~QAppCpp()
 {
 }
 
-void QAppCpp::setImportPath(const char *path)
+void QAppCpp::addImportPath(const char *path)
 {
-    m_importPath = QString(path);
+    m_importPaths.push_back(QString(path));
 }
 
 void QAppCpp::setPluginsPath(const char *path)
@@ -40,7 +40,8 @@ int QAppCpp::run(int argc, char **argv)
 
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    engine.addImportPath(m_importPath);
+    for (const auto &path: m_importPaths)
+        engine.addImportPath(path);
 
     engine.setInitialProperties(m_map);
     engine.load(m_root);

@@ -17,7 +17,7 @@ public:
     QAppCpp();
     ~QAppCpp();
 
-    void setImportPath(const char *path);
+    void addImportPath(const char *path);
     void setPluginsPath(const char *path);
 
     void addInitialProperty(const char *name, QVariant value);
@@ -26,7 +26,7 @@ public:
     int run(int argc, char **argv);
 
 private:
-    QString m_importPath;
+    std::vector<QString> m_importPaths;
     QString m_pluginsPath;
     QVariantMap m_map;
     QUrl m_root;
