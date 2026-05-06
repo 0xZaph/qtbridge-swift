@@ -2,7 +2,7 @@ type: Group
 instructions:
   - type: Group
     instructions:
-      - !include "{{qt/qtbridge-swift}}/install_swift.yaml"
+      - !include "{{qt/qtbridge-swift}}/install_swift_win.yaml"
       - !include "{{qt/qtbridge-swift}}/find_msvc.yaml"
     enable_if:
       condition: property
