@@ -3,6 +3,9 @@
 
 import QtBridge
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 @MainActor
 @QtBridgeable
