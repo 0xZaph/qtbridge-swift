@@ -5,17 +5,18 @@
 
 ## Contents
 
-1. [Introduction](##Introduction)
-2. [Status](##Status)
-3. [Supported platforms](##Supported-platforms)
-4. [Requirements](##Requirements)
-5. [Installing Qt Bridge](##Installing-Qt-Bridge)
-    1. [Importing Qt Bridge as a remote package](###Importing-Qt-Bridge-as-a-remote-package)
-    2. [Importing Qt Bridge as a local package](Importing-Qt-Bridge-as-a-local-package)
-    3. [Disable Library Validation Entitlement](###Disable-Library-Validation-Entitlement)
-6. [Running examples](##Running-examples)
-7. [Using Xcode templates](##Using-Xcode-templates)
-8. [Stay in touch](##Stay-in-touch)
+1. [Introduction](#introduction)
+2. [Status](#status)
+3. [Supported platforms](#supported-platforms)
+4. [Requirements](#requirements)
+5. [Installing Qt Bridge](#installing-qt-bridge)
+    1. [Importing Qt Bridge as a remote package](#importing-qt-bridge-as-a-remote-package)
+    2. [Importing Qt Bridge as a local package](#importing-qt-bridge-as-a-local-package)
+    3. [Disable Library Validation Entitlement](#disable-library-validation-entitlement)
+6. [Running examples](#running-examples)
+7. [Using Xcode templates](#using-xcode-templates)
+8. [Stay in touch](#stay-in-touch)
+9. [Terms and Conditions](#terms-and-conditions)
 
 ## Introduction
 
@@ -40,7 +41,12 @@ Notable limitations include:
 
 ## Supported platforms
 
-Currently, **macOS (Apple Silicon)** and **Linux (x86_64, aarch64)** are supported, with plans to extend support in the future.
+The following platforms are currently supported:
+- **macOS (Apple Silicon)**
+- **Linux (x86_64, aarch64)**
+- **Windows (x64, MSVC 2022)**
+
+Support for additional platforms is planned in the future.
 
 ## Requirements
 
@@ -52,7 +58,7 @@ Currently, **macOS (Apple Silicon)** and **Linux (x86_64, aarch64)** are support
 - [Xcode](https://developer.apple.com/xcode/) or [Swift Package Manager](https://github.com/swiftlang/swift-package-manager)
 
 ### For CMake builds
-- **macOS 14** or later (for macOS) or **Linux**
+- **macOS 14** or later (for macOS), **Linux** or **Windows 11**
 - [CMake](https://cmake.org/) **3.22** or later
 - [Ninja](https://ninja-build.org/)
 - [Qt](https://www.qt.io/) **6.10** or later
@@ -210,7 +216,8 @@ it, but disabling Library Validation alone is sufficient.
 
 ## Running examples
 
-**Examples** directory contains simple projects implemented with Qt Bridge. For instance, to build and run MinimalApp:
+**Examples** directory contains simple projects implemented with Qt Bridge. For instance,
+to build and run MinimalApp:
 
 ### With Xcode
 
@@ -280,8 +287,9 @@ Qt Bridge as a package dependency.
 
 ### Running the example application
 
-The generated project may fail to launch if **Hardened Runtime** is enabled because Qt Bridge dynamically loads Qt frameworks at runtime. To fix this, you need to disable **Library Validation**. For detailed instructions, see [Disable Library Validation Entitlement](##Disable-Library-Validation-Entitlement)
-.
+The generated project may fail to launch if **Hardened Runtime** is enabled because
+Qt Bridge dynamically loads Qt frameworks at runtime. To fix this, you need to disable
+**Library Validation**. For detailed instructions, see [Disable Library Validation Entitlement](#disable-library-validation-entitlement).
 
 At this point, the example application is ready to run. You can do so, by pressing
 the *Run* button. The project template configures the basic build settings and
@@ -290,8 +298,8 @@ target configuration. For more advanced configuration, you can adjust
 
 ## Stay in touch
 
-You can reach us in the Qt Forum, specifically in the [Qt Bridges
-category](https://forum.qt.io/category/78/qt-bridges).
+Feel free to reach out on our [Qt Bridges forum](https://forum.qt.io/category/78/qt-bridges)
+or join the [Qt Bridges Discord](https://discord.com/invite/WNdGHnHagP) server.
 
 ## Terms and Conditions
 
