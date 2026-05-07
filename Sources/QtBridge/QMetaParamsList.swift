@@ -3,6 +3,28 @@
 
 import QtBridgeCpp
 
+/// A list of arguments passed from QML to a Swift method.
+///
+/// `QMetaParamsList` is used internally by the Qt Bridge
+/// bridging system and is not intended to be created or used
+/// directly.
+///
+/// ## Supported Types
+///
+/// Qt Bridge provides support for methods with the arguments
+/// of the following types:
+///
+/// | Swift | Qt |
+/// |---|---|
+/// | `Bool` | `bool` |
+/// | `Int` | `int` |
+/// | `UInt` | `uint` |
+/// | `Double` | `double` |
+/// | `Float` | `float` |
+/// | `String` | `QString` |
+/// | `[String]` | `QStringList` |
+/// | `[String: QVariantSettable]` | `QVariantMap` |
+///
 @MainActor
 public class QMetaParamsList {
     private let args: MetaParamsList
@@ -11,6 +33,12 @@ public class QMetaParamsList {
         self.args = args
     }
 
+    /// Returns the argument at the given index as the
+    /// inferred Swift type.
+    ///
+    /// - Parameter index: The zero-based position
+    /// of the argument in the list.
+    /// - Returns: The argument at `index` as type `T`.
     public func get<T: QMetaParamsGettable>(_ index: Int) -> T {
         return T.get(from: self, index: index)
     }
@@ -34,8 +62,17 @@ public class QMetaParamsList {
     }
 }
 
+/// A type that can be extracted from a ``QMetaParamsList``.
 @MainActor
 public protocol QMetaParamsGettable {
+
+    /// Extracts a value of this type from the parameter list.
+    ///
+    /// - Parameters:
+    ///   - params: The parameter list received from QML.
+    ///   - index: The zero-based position of the argument
+    ///   to extract.
+    /// - Returns: The extracted value as `Self`.
     static func get(from params: QMetaParamsList, index: Int) -> Self
 }
 

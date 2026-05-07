@@ -20,6 +20,8 @@
 /// A method is exposed to QML if it:
 /// - Is declared `public`.
 /// - Is an instance method.
+/// - Has argument types supported by ``QMetaParamsList``.
+/// - Returns `Void`, or a value conforming to ``QVariantSettable``.
 ///
 /// Use ``QtIgnored()`` to exclude specific members from being
 /// exposed.
