@@ -86,7 +86,7 @@ Qt Bridge can be added to your project via Swift Package Manager or CMake.
 3. Enable Swift-C++ interoperability in *swiftSettings* with .*interoperabilityMode(.Cxx)* mode.
 ```
 dependencies: [
-    .package(url: "https://github.com/qt/qtbridge-swift", exact: "0.1.1-alpha")
+    .package(url: "https://github.com/qt/qtbridge-swift", exact: "0.2.0-beta")
 ],
 targets: [
     .target(
@@ -113,7 +113,7 @@ add_executable(MyApp Sources/app.swift)
 include(FetchContent)
 FetchContent_Declare(QtBridge
     GIT_REPOSITORY https://github.com/qt/qtbridge-swift.git
-    GIT_TAG 0.1.1-alpha
+    GIT_TAG 0.2.0-beta
 )
 FetchContent_MakeAvailable(QtBridge)
 
@@ -135,7 +135,7 @@ Firstly, clone the [Qt Bridge for Swift repo](https://github.com/qt/qtbridge-swi
 ```sh
 git clone https://github.com/qt/qtbridge-swift
 cd qtbridge-swift
-git checkout 0.1.1-alpha
+git checkout 0.2.0-beta
 ```
 
 #### Add via Xcode
