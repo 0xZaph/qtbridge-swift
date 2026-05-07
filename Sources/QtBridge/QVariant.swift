@@ -9,9 +9,23 @@ import QtBridgeCpp
 /// Swift values must be converted to `QVariant` in order to be
 /// visible to QML. The conversion is handled automatically for
 /// supported types via ``QVariantGettable`` and
-/// ``QVariantSettable``. Qt Bridge provides built-in support
-/// for common Swift types such as `Int`, `UInt`, `Bool`,
-/// `Double`, `Float`, `String`, and array of `String` elements.
+/// ``QVariantSettable``.
+///
+/// ## Supported Types
+///
+/// Qt Bridge provides built-in support for the following Swift types:
+///
+/// | Swift | Qt |
+/// |---|---|
+/// | `Bool` | `bool` |
+/// | `Int` | `int` |
+/// | `UInt` | `uint` |
+/// | `Double` | `double` |
+/// | `Float` | `float` |
+/// | `String` | `QString` |
+/// | `[String]` | `QStringList` |
+/// | `[String: QVariantSettable]` | `QVariantMap` |
+///
 @MainActor
 public struct QVariant
 {
@@ -82,6 +96,10 @@ public struct QVariant
         self.variant = value.objectHolder.proxy.toVariant()
     }
 
+    /// Creates a variant from a Swift dictionary.
+    ///
+    /// - Parameter value: A dictionary to be bridged to
+    /// QML as a `QVariantMap`.
     public init(value: [String: QVariantSettable]) {
         var map: QtBridgeCpp.QVariantMap = QtBridgeCpp.QVariantMap()
         value.forEach { key, value in
