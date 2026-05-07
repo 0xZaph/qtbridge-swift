@@ -13,6 +13,18 @@ public class QObjectHolder {
     package var proxy: QObjectProxy
     internal weak var owner: (QObjectBuildable)?
 
+    /// Creates a holder for a specified owner, which lifecycle
+    /// is managed by QML.
+    ///
+    /// - Parameters:
+    ///   - owner: The Swift object that owns this holder.
+    ///   - ptr: Raw pointer where the QObject will be
+    ///   created.
+    ///   - deleter: Function used to release the Swift
+    ///   object when QML destroys the QObject.
+    ///
+    /// This initializer is used by the bridging code. Don’t call it
+    /// directly.
     public init(owner: QObjectBuildable,
                 ptr: UnsafeMutableRawPointer,
                 deleter: @escaping @convention(c) (UnsafeMutableRawPointer?) -> Void)
@@ -37,8 +49,11 @@ public class QObjectHolder {
 
     /// Creates a holder for a specified owner.
     ///
-    /// This initializer is used by the bridging code.
-    /// Don’t call it directly.
+    /// - Parameters:
+    ///   - owner: The Swift object that owns this holder.
+    ///
+    /// This initializer is used by the bridging code. Don’t call it
+    /// directly.
     public init(owner: QObjectBuildable) {
         self.owner = owner
         self.proxy = QObjectProxy(QObjectHolder.bridge(owner))

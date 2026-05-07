@@ -54,16 +54,36 @@ internal class QMLApp {
 /// @main
 /// struct MyApp: QApp {
 ///     let qmlFileName: String = "main"
-///     var initialProperties: [String: QObjectBuildable] {
-///         [
-///             "myModel": MyModel()
-///         ]
-///     }
+///     var initialProperties: [String: QObjectBuildable] = [
+///         "myModel": MyModel()
+///     ]
+///     var instantiableTypes: [QmlInstantiable.Type] = [
+///         MyType.self
+///     ]
 /// }
 /// ```
 ///
 /// The objects returned in ``initialProperties`` are exposed
-/// to QML and can be accessed from QML using the provided keys.
+/// to QML and can be accessed from QML using the provided keys:
+///
+/// ```qml
+/// ApplicationWindow {
+///     required property QtObject myModel
+/// }
+///```
+///
+/// The types returned in ``instantiableTypes`` can be instantiated
+/// directly from QML as if they were native QML components. The type
+/// will be available under the QML module whose name matches the Swift
+/// module name and any nesting context.
+///
+/// ```qml
+/// import MyApp // Swift module where MyType is defined
+///
+/// MyType {
+///     id: mytype
+/// }
+/// ```
 @MainActor public protocol QApp {
     /// Creates the application instance.
     init()
@@ -96,6 +116,15 @@ internal class QMLApp {
     /// ``QtBridgeable()`` macro.
     var initialProperties: [String: QObjectBuildable] { get }
 
+    /// Swift types that can be instantiated from QML.
+    ///
+    /// Register types here to make them available as QML
+    /// components. The type will be available under the
+    /// QML module whose name matches the Swift module
+    /// name and any nesting context for this type.
+    ///
+    /// Each type must conform to ``QmlInstantiable``
+    /// and be annotated with the ``QtBridgeable()`` macro.
     var instantiableTypes: [QmlInstantiable.Type] { get }
 }
 

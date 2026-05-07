@@ -18,7 +18,8 @@ public protocol QObjectBuildable : AnyObject,
     /// call it directly.
     var objectHolder: QObjectHolder { get }
 
-    /// An internal builder used to construct QMetaObject.
+    /// An internal builder used to construct QMetaObject and
+    /// QMetaTypeInterface.
     ///
     /// The value is provided by the ``QtBridgeable()`` macro.
     /// Don't access it directly.
@@ -28,8 +29,14 @@ public protocol QObjectBuildable : AnyObject,
     /// System.
     ///
     /// This method is implemented by ``QtBridgeable()`` macro.
-    /// Don't call or implement it yourself.
+    /// Don't call or implement it directly.
     static func registerMethodsAndProperties(for builder: QMetaObjectBuilder) -> Void
+
+    /// Registers the callbacks required to construct a QMetaTypeInterface
+    /// for the conforming type.
+    ///
+    /// This method is implemented by ``QtBridgeable()`` macro.
+    /// Don't call or implement it directly.
     static func registerMetaTypeInterface(for builder: QMetaObjectBuilder) -> Void
 }
 

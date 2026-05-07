@@ -352,6 +352,19 @@ public class QMetaObjectBuilder
         self.initFn = initFn
     }
 
+    /// Registers a callback used to create a root object from QML.
+    ///
+    /// - Parameter objectHolderPath: A writable key path
+    /// on the root object where the ``QObjectHolder`` will be
+    /// stored.
+    ///
+    /// When the registred callback is called, the created Swift
+    /// instance is retained and associated with its QObject lifecycle.
+    /// When the QObject is destroyed by QML, the associated Swift
+    /// object is automatically released.
+    ///
+    /// This method is used by the bridging system. Don't call it
+    /// directly.
     public func registerCreateFn<Root: QObjectBuildable>(objectHolderPath: WritableKeyPath<Root, QObjectHolder?>) -> Void {
         guard let initFn = self.initFn else {
             return
