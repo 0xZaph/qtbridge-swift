@@ -1,0 +1,4 @@
+module _CQtEventLoop {
+    umbrella header "_CQtEventLoop.h"
+    export *
+}

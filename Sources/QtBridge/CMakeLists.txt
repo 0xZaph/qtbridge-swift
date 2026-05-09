@@ -31,6 +31,7 @@ target_link_libraries(QtBridge
         Qt6::Gui
         Qt6::Qml
         Qt6::Quick
+        QtEventLoop
         QtBridgeCpp
     PRIVATE
         Qt6::CorePrivate

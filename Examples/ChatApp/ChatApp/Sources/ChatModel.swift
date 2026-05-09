@@ -6,10 +6,10 @@ import QtBridge
 
 @MainActor
 @QtBridgeable
-public class Message {
+public final class Message {
     var author: String
     var textmessage: String
-    var date:   String
+    var date: String
 
     public init(author: String, textmessage: String, date: String) {
         self.author = author
@@ -20,17 +20,22 @@ public class Message {
 
 @MainActor
 @QtBridgeable
-public class ChatModel {
+public final class ChatModel {
 
     public var msgs: QListModel<Message> = []
 
     public init() {
-        msgs.append(Message(author: "Special Agent Dale Cooper",
-                            textmessage: "The owls are not what they seem.",
-                            date: "Feb 1989"))
+        msgs.append(
+            Message(
+                author: "Special Agent Dale Cooper",
+                textmessage: "The owls are not what they seem.",
+                date: "Feb 1989"
+            )
+        )
     }
 
-    private let replies = [
+    nonisolated
+    private static let replies = [
         "Hello!",
         "Damn good coffee!",
         "See you at the Roadhouse.",
@@ -42,12 +47,42 @@ public class ChatModel {
         "I’ll bring the tape recorder."
     ]
 
-    public func insertReply(author: String,  text: String, date: String) {
-        msgs.append(Message(author: author, textmessage: text, date: date))
-        if author == "Me", !text.isEmpty {
-            msgs.append(Message(author: "Special Agent Dale Cooper",
-                                textmessage: replies.randomElement() ?? "…",
-                                date: Date.now.formatted(date: .omitted, time: .shortened)
+    @concurrent
+    nonisolated
+    private static func generateReply() async -> String {
+        try? await Task.sleep(for: .seconds(1))
+
+        return replies.randomElement() ?? "..."
+    }
+
+    public func insertReply(
+        author: String,
+        text: String,
+        date: String
+    ) {
+        msgs.append(
+            Message(
+                author: author,
+                textmessage: text,
+                date: date
+            )
+        )
+
+        guard author == "Me", !text.isEmpty else {
+            return
+        }
+
+        Task {
+            let reply = await Self.generateReply()
+
+            msgs.append(
+                Message(
+                    author: "Special Agent Dale Cooper",
+                    textmessage: reply,
+                    date: Date.now.formatted(
+                        date: .omitted,
+                        time: .shortened
+                    )
                 )
             )
         }

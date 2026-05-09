@@ -9,6 +9,7 @@ import QtBridgeCpp
 // For CMake builds, the equivalent resources come from the system Qt installation.
 import QmlImports
 #endif // !QT_IS_CMAKE_BUILD
+internal import QtEventLoop
 
 @MainActor
 internal class QMLApp {
@@ -144,6 +145,8 @@ internal class QMLApp {
     /// this method directly. It is invoked automatically by the
     /// Swift runtime for the type marked with `@main`.
     static func main() {
+        QtEventLoop.installGlobalExecutor()
+
         let qApp = Self()
         let app = QMLApp()
 

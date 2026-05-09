@@ -85,6 +85,8 @@ endif()
 add_library(QtBridgeMacros INTERFACE)
 add_dependencies(QtBridgeMacros QtBridgeMacros_External)
 
+add_subdirectory(Sources/_CQtEventLoop)
+add_subdirectory(Sources/QtEventLoop)
 add_subdirectory(Sources/QtBridgeCpp)
 add_subdirectory(Sources/QtBridge)
 

@@ -53,9 +53,26 @@ let package = Package(
                 "CMakeLists.txt"
             ]
         ),
+        .target(name: "_CQtEventLoop",
+            dependencies: [
+                .product(name: "QtCore", package: qtPackageName)
+            ],
+            exclude: [
+                "CMakeLists.txt"
+            ]
+        ),
+        .target(name: "QtEventLoop",
+            dependencies: [
+                .product(name: "QtCore", package: qtPackageName)
+            ],
+            exclude: [
+                "CMakeLists.txt"
+            ]
+        ),
         .target(
             name: "QtBridge",
             dependencies: [
+                "QtEventLoop",
                 "QtBridgeCpp",
                 "QtBridgeMacros",
                 .product(name: "QtCore", package: qtPackageName),
