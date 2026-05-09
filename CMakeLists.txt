@@ -37,6 +37,8 @@ find_package(Qt6 6.10 REQUIRED COMPONENTS
     CorePrivate
 )
 
+find_package(Qt6 6.10 COMPONENTS Widgets QuickControls2 QUIET)
+
 set(CMAKE_AUTOMOC ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

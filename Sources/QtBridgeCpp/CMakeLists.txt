@@ -27,6 +27,14 @@ target_link_libraries(QtBridgeCpp
         Qt6::CorePrivate
 )
 
+if (TARGET Qt6::Widgets)
+    target_link_libraries(QtBridgeCpp PUBLIC Qt6::Widgets)
+endif()
+
+if (TARGET Qt6::QuickControls2)
+    target_link_libraries(QtBridgeCpp PUBLIC Qt6::QuickControls2)
+endif()
+
 target_include_directories(QtBridgeCpp
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

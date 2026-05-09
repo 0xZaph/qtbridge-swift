@@ -11,23 +11,51 @@
 
 #include "qobjectproxy.h"
 
-class QAppCpp
-{
+class QCoreApplication;
+class QQmlApplicationEngine;
+
+class QAppCpp {
 public:
-    QAppCpp();
-    ~QAppCpp();
+  QAppCpp();
+  ~QAppCpp();
 
-    void addImportPath(const char *path);
-    void setPluginsPath(const char *path);
+  QAppCpp(const QAppCpp &) = delete;
+  QAppCpp &operator=(const QAppCpp &) = delete;
 
-    void addInitialProperty(const char *name, QVariant value);
-    void setRootQml(const char *path);
+  QAppCpp(QAppCpp &&other) noexcept;
+  QAppCpp &operator=(QAppCpp &&other) noexcept;
 
-    int run(int argc, char **argv);
+  void addImportPath(const char *path);
+  void setPluginsPath(const char *path);
+
+  void addInitialProperty(const char *name, QVariant value);
+  void setRootQml(const char *path);
+
+  static void setOrganizationName(const char *name);
+  static void setOrganizationDomain(const char *domain);
+  static void setApplicationName(const char *name);
+  static void setDesktopFileName(const char *name);
+  static void setStyle(const char *style);
+
+  void createApplication(int argc, char **argv, bool useQtWidgets);
+  void createEngine();
+  void load();
+  int exec();
+
+  void *getAppPointer() const { return m_app; }
+  void *getEnginePointer() const SWIFT_RETURNS_INDEPENDENT_VALUE {
+    return m_engine;
+  }
 
 private:
-    std::vector<QString> m_importPaths;
-    QString m_pluginsPath;
-    QVariantMap m_map;
-    QUrl m_root;
+  std::vector<QString> m_importPaths;
+  QString m_pluginsPath;
+  QVariantMap m_map;
+  QUrl m_root;
+
+  int m_argc = 0;
+  char **m_argv = nullptr;
+
+  QCoreApplication *m_app = nullptr;
+  QQmlApplicationEngine *m_engine = nullptr;
 };

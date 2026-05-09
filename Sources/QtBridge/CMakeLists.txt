@@ -37,6 +37,14 @@ target_link_libraries(QtBridge
         Qt6::CorePrivate
 )
 
+if (TARGET Qt6::Widgets)
+    target_link_libraries(QtBridge PUBLIC Qt6::Widgets)
+endif()
+
+if (TARGET Qt6::QuickControls2)
+    target_link_libraries(QtBridge PUBLIC Qt6::QuickControls2)
+endif()
+
 set(package_name "-package-name" "QtBridge")
 target_compile_options(QtBridge PUBLIC
     "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>"

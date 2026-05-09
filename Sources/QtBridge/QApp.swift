@@ -3,16 +3,17 @@
 
 import Foundation
 import QtBridgeCpp
-#if !QT_IS_CMAKE_BUILD
-// `QmlImports` is provided by the Swift Package `qtforswift` and exposes a
-// resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
-// For CMake builds, the equivalent resources come from the system Qt installation.
-import QmlImports
-#endif // !QT_IS_CMAKE_BUILD
 internal import QtEventLoop
 
+#if !QT_IS_CMAKE_BUILD
+    // `QmlImports` is provided by the Swift Package `qtforswift` and exposes a
+    // resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
+    // For CMake builds, the equivalent resources come from the system Qt installation.
+    import QmlImports
+#endif  // !QT_IS_CMAKE_BUILD
+
 @MainActor
-internal class QMLApp {
+public class QMLApp {
     var qmlApp: QAppCpp
 
     public init() {
@@ -35,8 +36,47 @@ internal class QMLApp {
         qmlApp.setRootQml(path)
     }
 
-    public func run(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>!) {
-        qmlApp.run(argc, argv)
+    public static func setOrganizationName(_ name: String) {
+        QAppCpp.setOrganizationName(name)
+    }
+
+    public static func setOrganizationDomain(_ domain: String) {
+        QAppCpp.setOrganizationDomain(domain)
+    }
+
+    public static func setApplicationName(_ name: String) {
+        QAppCpp.setApplicationName(name)
+    }
+
+    public static func setDesktopFileName(_ name: String) {
+        QAppCpp.setDesktopFileName(name)
+    }
+
+    public static func setStyle(_ style: String) {
+        QAppCpp.setStyle(style)
+    }
+
+    public func createApplication(
+        argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>!, useQtWidgets: Bool
+    ) {
+        qmlApp.createApplication(argc, argv, useQtWidgets)
+    }
+
+    public func createEngine() {
+        qmlApp.createEngine()
+    }
+
+    public func load() {
+        qmlApp.load()
+    }
+
+    @discardableResult
+    public func exec() -> Int32 {
+        return qmlApp.exec()
+    }
+
+    public func getEnginePointer() -> UnsafeMutableRawPointer? {
+        return qmlApp.getEnginePointer()
     }
 }
 
@@ -131,12 +171,34 @@ internal class QMLApp {
     /// Each type must conform to ``QmlInstantiable``
     /// and be annotated with the ``QtBridgeable()`` macro.
     var instantiableTypes: [QmlInstantiable.Type] { get }
+
+    /// Whether the application requires QtWidgets.
+    var requireQtWidgets: Bool { get }
+
+    func preApplicationCreate()
+
+    func postApplicationCreate()
+
+    func engineDidCreate(enginePointer: UnsafeMutableRawPointer)
 }
 
-@MainActor public extension QApp {
-    var bundle: Bundle { .main }
-    var initialProperties: [String: QObjectBuildable] { [:] }
-    var instantiableTypes: [QmlInstantiable.Type] { [] }
+@MainActor extension QApp {
+    public var bundle: Bundle { .main }
+    public var initialProperties: [String: QObjectBuildable] { [:] }
+    public var instantiableTypes: [QmlInstantiable.Type] { [] }
+    public var requireQtWidgets: Bool {
+#if os(iOS) || os(Android)
+        false
+#else
+        true
+#endif
+    }
+
+    public func preApplicationCreate() {}
+
+    public func postApplicationCreate() {}
+
+    public func engineDidCreate(enginePointer: UnsafeMutableRawPointer) {}
 
     /// Starts the application.
     ///
@@ -144,7 +206,7 @@ internal class QMLApp {
     /// environment and begins the event loop. You don't call
     /// this method directly. It is invoked automatically by the
     /// Swift runtime for the type marked with `@main`.
-    static func main() {
+    public static func main() {
         QtEventLoop.installGlobalExecutor()
 
         let qApp = Self()
@@ -157,7 +219,22 @@ internal class QMLApp {
         // when using CMake.
         app.addImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         app.setPluginsPath(path: Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
-        #endif // !QT_IS_CMAKE_BUILD
+        #endif  // !QT_IS_CMAKE_BUILD
+
+        qApp.preApplicationCreate()
+        app.createApplication(
+            argc: CommandLine.argc, argv: CommandLine.unsafeArgv,
+            useQtWidgets: qApp.requireQtWidgets)
+
+        qApp.postApplicationCreate()
+
+        app.createEngine()
+
+        if let enginePointer = app.getEnginePointer() {
+            qApp.engineDidCreate(enginePointer: enginePointer)
+        }
+
+
 
         if let bundlePath = qApp.bundle.resourceURL?.path {
             app.addImportPath(path: bundlePath)
@@ -176,6 +253,7 @@ internal class QMLApp {
             fatalError("Missing QML file '\(fileName).qml' in app bundle.")
         }
         app.setRootQml(path: qmlUrl.path)
-        app.run(argc: CommandLine.argc, argv: CommandLine.unsafeArgv)
+        app.load()
+        app.exec()
     }
 }
