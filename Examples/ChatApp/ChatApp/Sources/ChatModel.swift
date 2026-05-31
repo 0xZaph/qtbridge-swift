@@ -59,7 +59,7 @@ public final class ChatModel {
         author: String,
         text: String,
         date: String
-    ) {
+    ) async {
         msgs.append(
             Message(
                 author: author,
@@ -72,20 +72,18 @@ public final class ChatModel {
             return
         }
 
-        Task {
-            let reply = await Self.generateReply()
+        let reply = await Self.generateReply()
 
-            msgs.append(
-                Message(
-                    author: "Special Agent Dale Cooper",
-                    textmessage: reply,
-                    date: Date.now.formatted(
-                        date: .omitted,
-                        time: .shortened
-                    )
+        msgs.append(
+            Message(
+                author: "Special Agent Dale Cooper",
+                textmessage: reply,
+                date: Date.now.formatted(
+                    date: .omitted,
+                    time: .shortened
                 )
             )
-        }
+        )
     }
 
     public func clearMessages() {

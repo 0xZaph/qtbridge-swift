@@ -165,18 +165,28 @@ public struct QtBridgeableMacro {
     }
 
     private static func processFunctionDeclaration(className : String,
-                                                   functionDecl: FunctionDeclSyntax,
-                                                   into registrationsArr: inout [String],
-                                                   methodCounter : inout Int) -> Void
-    {
-        guard functionDecl.isValidForRegistration else {
-            return
+        functionDecl: FunctionDeclSyntax,
+        into registrationsArr: inout [String],
+        methodCounter : inout Int) -> Void
+        {
+        guard functionDecl.isValidForRegistration else { 
+            return 
         }
 
         if functionDecl.hasAttribute(QtBridgeableMacro.ignoredMacroName)
             || functionDecl.hasAttribute(QtBridgeableMacro.signalMacroName) {
             return
         }
+
+        let isAsync    = functionDecl.signature.effectSpecifiers?.asyncSpecifier != nil
+        let isThrowing = functionDecl.signature.effectSpecifiers?.throwsClause   != nil
+
+        if isAsync && (isThrowing || functionDecl.signature.returnClause?.type.isVoid == false) {
+            return
+        }
+
+        let returnClauseType = functionDecl.signature.returnClause?.type
+        guard returnClauseType?.isSupportedReturnType ?? true else { return }
 
         let methodName = functionDecl.name.text
         let params = functionDecl.signature.parameterClause.parameters
@@ -203,42 +213,43 @@ public struct QtBridgeableMacro {
             ? "self.\(methodName)()"
             : "self.\(methodName)(\(args.joined(separator: ", ")))"
 
-        let returnClauseType = functionDecl.signature.returnClause?.type
-        let isSupportedReturnType = returnClauseType?.isSupportedReturnType ?? true
-        if (!isSupportedReturnType) {
-            return
-        }
-
         let returnsVoid = returnClauseType?.isVoid ?? true
         let returnTypeString = returnClauseType?.trimmed.description ?? ""
         let returnType: String = returnsVoid ? "nil" : "\(returnTypeString).self"
         let returnBody: String = {
-            if returnsVoid {
+            if isAsync {
+                return """
+                Task {
+                    await \(call)
+                }
+                return QVariant()
+                """
+            } else if returnsVoid {
                 return """
                 \(call)
-                    return QVariant()
+                return QVariant()
                 """
             } else {
                 return "return QVariant(value: \(call))"
             }
         }()
 
-        let registration =
+        let registration = 
         """
-        \(arrayInit)
-        \(pushCalls.joined(separator: "\n"))
-        builder.registerSlot(
-            name: "\(methodName)",
-            returnType: \(returnType),
-            argTypes: \(arrayName),
-            method: { (owner: Any, args: \(paramsListName)) in
-            guard let self = owner as? \(className) else {
-                return QVariant()
-            }
-            \(paramExtraction.joined(separator: "\n    "))
-            \(returnBody)
-        })
-        """
+            \(arrayInit)
+            \(pushCalls.joined(separator: "\n"))
+            builder.registerSlot(
+                name: "\(methodName)",
+                returnType: \(returnType),
+                argTypes: \(arrayName),
+                method: { (owner: Any, args: \(paramsListName)) in
+                guard let self = owner as? \(className) else {
+                    return QVariant()
+                }
+                \(paramExtraction.joined(separator: "\n    "))
+                \(returnBody)
+            })
+            """
 
         methodCounter += 1
         registrationsArr.append(registration)
