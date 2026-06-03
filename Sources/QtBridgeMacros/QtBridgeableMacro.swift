@@ -227,7 +227,7 @@ public struct QtBridgeableMacro {
             } else if returnsVoid {
                 return """
                 \(call)
-                return QVariant()
+                    return QVariant()
                 """
             } else {
                 return "return QVariant(value: \(call))"
@@ -326,6 +326,23 @@ extension DiagnosticsError {
 }
 
 extension QtBridgeableMacro : MemberMacro {
+
+    private static func flattenMembers(
+        _ members: MemberBlockItemListSyntax
+    ) -> [MemberBlockItemSyntax] {
+        members.flatMap { item -> [MemberBlockItemSyntax] in
+            if let ifConfig = item.decl.as(IfConfigDeclSyntax.self) {
+                // Recursively flatten nested members inside #if blocks
+                return ifConfig.clauses.flatMap { clause in
+                    clause.elements?
+                        .as(MemberBlockItemListSyntax.self)
+                        .map(flattenMembers) ?? []
+                }
+            }
+            return [item]
+        }
+    }
+
     public static func expansion(
         of node: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
@@ -351,15 +368,18 @@ extension QtBridgeableMacro : MemberMacro {
         var registrations: [String] = []
         var nSignals = 1
         var nSlots = 1
+
+        let members = flattenMembers(classDecl.memberBlock.members)
+
         // Signals must be registered first
-        for member in classDecl.memberBlock.members {
+        for member in members {
             guard let functionDecl = member.decl.as(FunctionDeclSyntax.self) else { continue }
             if functionDecl.hasAttribute(QtBridgeableMacro.signalMacroName) {
                 processSignalDeclaration(functionDecl: functionDecl, into: &registrations, signalCounter: &nSignals)
             }
         }
 
-        for member in classDecl.memberBlock.members {
+        for member in members {
             if let functionDecl = member.decl.as(FunctionDeclSyntax.self) {
                 processFunctionDeclaration(className: typeName, functionDecl: functionDecl,
                                            into: &registrations, methodCounter: &nSlots)

@@ -1,53 +1,53 @@
-// Copyright (C) 2025 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
-
 import QtBridge
-import Foundation
 
 @MainActor
-@QtBridgeable
-public class Contact {
-    var firstName: String
-    var lastName: String
-    var phoneNo: String
+public class Modelle {
+    var name: String
+    var value: Int
 
-    public init(_ firstName: String, _ lastName: String, _ phoneNo: String) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.phoneNo = phoneNo
+    public init(_ name: String, _ value: Int) {
+        self.name = name
+        self.value = value
     }
 }
 
+
+#if canImport(QtBridge)
+public typealias ModelleList = [Modelle]
+#else
+public typealias ModelleList = [Modelle]
+#endif
+
+
 @MainActor
-@QtBridgeable
-public class PhoneBookModel {
+public class Modellette {
+#if canImport(QtBridge)
+    public var modelles: ModelleList = [Modelle("one", 1), Modelle("two", 2)]
+#endif
 
-    public var phoneBook: QListModel<Contact> = [Contact("Michael", "Scott", "03-134-993"),
-                                                 Contact("Pam", "Beasly", "13-579-246")]
 
-    public var replacingModel: QListModel<Contact> = [Contact("Jane", "Doe", "13-579-246")]
+private var _objectHolder: QtBridge.QObjectHolder?
 
-    public func addContact(firstName: String, lastName: String, phoneNo: String) {
-        phoneBook.append(Contact(firstName, lastName, phoneNo))
+public lazy var objectHolder: QtBridge.QObjectHolder = {
+    if let object = _objectHolder {
+        return object
     }
+    return QtBridge.QObjectHolder(owner: self)
+}()
 
-    public func removeContact(at index: Int) {
-        phoneBook.remove(at: index)
-    }
+static public let metaObjectBuilder: QtBridge.QMetaObjectBuilder = {
+    return QtBridge.QMetaObjectBuilder.create(from: Modellette.self)
+}()
 
-    public func replaceContact(at index: Int, firstName: String, lastName: String, phoneNo: String) {
-        phoneBook[index] = Contact(firstName, lastName, phoneNo)
-    }
+public static func registerMethodsAndProperties(for builder: QtBridge.QMetaObjectBuilder) {
+    builder.startRegistration(for: self)
 
-    public func updatePhoneNo(at index: Int, phoneNo: String) {
-        phoneBook[index].phoneNo = phoneNo
-    }
+}
 
-    public func replacePhoneBook() {
-        phoneBook = replacingModel
-    }
+public static func registerMetaTypeInterface(for builder: QtBridge.QMetaObjectBuilder) {
+    builder.registerCreateFn(objectHolderPath: \Modellette._objectHolder)
+}
+}
 
-    public func eraseContacts() {
-        phoneBook.reset()
-    }
+extension Modellette: QtBridge.QObjectBuildable {
 }
