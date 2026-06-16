@@ -64,7 +64,7 @@ if(DEFINED QTBRIDGE_SWIFT_BRIDGING_INCLUDE)
 endif()
 
 target_compile_options(QtBridge PRIVATE
-    "$<$<COMPILE_LANGUAGE:Swift>:-DQT_IS_CMAKE_BUILD>"
+    "$<$<COMPILE_LANGUAGE:Swift>:-DQT_IS_SYSTEM_PACKAGE>"
 )
 
 # Depend on macros being built

@@ -3,12 +3,13 @@
 
 import Foundation
 import QtBridgeCpp
-#if !QT_IS_CMAKE_BUILD
+#if !QT_IS_SYSTEM_PACKAGE
 // `QmlImports` is provided by the Swift Package `qtforswift` and exposes a
-// resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
-// For CMake builds, the equivalent resources come from the system Qt installation.
+// resource bundle containing QML files, bundled Qt plugins, and binary artifacts.
+// For system-linked builds (CMake or non-macOS SPM), these resources are provided
+// directly by the host system's Qt installation instead.
 import QmlImports
-#endif // !QT_IS_CMAKE_BUILD
+#endif // !QT_IS_SYSTEM_PACKAGE
 
 /// Represents a QML module to be registered for Qt Quick tests.
 ///
@@ -103,10 +104,10 @@ public enum QtQuickTestRunner {
     @discardableResult
     public static func run(config: QtQuickTestConfiguration) -> Int32 {
         var qTestApp = QTestAppCpp()
-#if !QT_IS_CMAKE_BUILD
+#if !QT_IS_SYSTEM_PACKAGE
         qTestApp.setImportPath(Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         qTestApp.setPluginsPath(Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
-#endif // !QT_IS_CMAKE_BUILD
+#endif // !QT_IS_SYSTEM_PACKAGE
         qTestApp.setInputDir(config.inputDir.path)
         qTestApp.setTestName(config.testName)
 

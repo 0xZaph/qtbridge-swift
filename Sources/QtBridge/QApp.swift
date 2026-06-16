@@ -3,12 +3,13 @@
 
 import Foundation
 import QtBridgeCpp
-#if !QT_IS_CMAKE_BUILD
+#if !QT_IS_SYSTEM_PACKAGE
 // `QmlImports` is provided by the Swift Package `qtforswift` and exposes a
-// resource bundle that contains QML files, bundled Qt plugins, and binary artifacts.
-// For CMake builds, the equivalent resources come from the system Qt installation.
+// resource bundle containing QML files, bundled Qt plugins, and binary artifacts.
+// For system-linked builds (CMake or non-macOS SPM), these resources are provided
+// directly by the host system's Qt installation instead.
 import QmlImports
-#endif // !QT_IS_CMAKE_BUILD
+#endif // !QT_IS_SYSTEM_PACKAGE
 internal import QtEventLoop
 
 @MainActor
@@ -150,14 +151,14 @@ internal class QMLApp {
         let qApp = Self()
         let app = QMLApp()
 
-        #if !QT_IS_CMAKE_BUILD
-        // For SPM builds `QmlImports` exposes `Bundle.qmlImports` containing
-        // the QML files and bundled plugins. For CMake builds the equivalent
-        // resources come from the system Qt installation so this is skipped
-        // when using CMake.
+        #if !QT_IS_SYSTEM_PACKAGE
+        // For bundled package builds, `QmlImports` exposes `Bundle.qmlImports` containing
+        // the QML files and bundled plugins. For system package builds (such as CMake 
+        // or non-macOS SPM), the equivalent resources come from the host system's 
+        // Qt installation, so this is skipped.
         app.addImportPath(path: Bundle.qmlImports.url(forResource: "qml", withExtension: nil)!.path)
         app.setPluginsPath(path: Bundle.qmlImports.url(forResource: "plugins", withExtension: nil)!.path)
-        #endif // !QT_IS_CMAKE_BUILD
+        #endif // !QT_IS_SYSTEM_PACKAGE
 
         if let bundlePath = qApp.bundle.resourceURL?.path {
             app.addImportPath(path: bundlePath)
